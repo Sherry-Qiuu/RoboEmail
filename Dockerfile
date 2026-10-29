@@ -11,7 +11,11 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
-RUN pnpm install --frozen-lockfile
+# --ignore-scripts: pnpm 11 treats a skipped install script as a hard error
+# (ERR_PNPM_IGNORED_BUILDS) and fails the build. The only package that wants
+# one is esbuild, and its binary ships as a normal dependency, so nothing here
+# actually needs a postinstall.
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 RUN pnpm build
