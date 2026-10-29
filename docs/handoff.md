@@ -110,7 +110,8 @@ RoboEmail/
 | 真实发信 | ✅ 可用 | `mailer/smtp.ts` | 见第 6 节 |
 | 忘记密码 | ✅ 可用 | `index.ts`、`ResetPage.tsx` | `/api/auth/forgot` + `/api/auth/reset` + `/reset?token=` 页面 |
 | 修改密码 | ✅ 可用 | `index.ts`、`MyPage.tsx` | 改完保留当前会话，其余设备退出 |
-| 自动化测试 / CI | ❌ 没有 | — | 全部靠手工验收，见 [usage.md](usage.md) 第 11 节 |
+| 冒烟测试 | ✅ 有脚本 | `scripts/smoke.mjs` | `pnpm smoke`，18 项检查，临时库跑完即删 |
+| CI | ❌ 没有 | — | 脚本要手动跑，没有流水线 |
 
 ---
 
@@ -185,7 +186,7 @@ RoboEmail/
 
 ## 8. 已知问题与风险
 
-1. **没有版本控制**。目录当前不是 git 仓库，改动无法回滚。接手后第一件事建议 `git init` 并提交一版基线（`.gitignore` 已写好，`.env` 和 `*.db` 会被忽略）。
+1. **已经纳入 git**。基线提交 `0a04212 chore: import roboemail baseline`，共 74 个跟踪文件；`.env`、`*.db`、`release/` 与三个抓取中间目录（`data/`、`data_business/`、`data_fhss/`）都在 `.gitignore` 里。改动前先开分支。
 2. **没有测试**。所有验收都是手工 HTTP 请求，改核心逻辑后请重跑 [usage.md](usage.md) 第 11 节的清单。
 3. **Gmail SMTP 在国内直连不通**（TLS 握手超时），只有国内邮箱或带代理才能发。当前 `.env` 配的是 QQ 邮箱。
 4. **个人邮箱发信有上限**。QQ / 163 对短时间高频发信会限流甚至封禁 SMTP 权限，验证码量大时要换企业邮箱或事务邮件服务。

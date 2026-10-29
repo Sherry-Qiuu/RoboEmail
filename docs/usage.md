@@ -71,6 +71,7 @@ npm run dev:web       # 窗口 B
 | `pnpm dev:web` | 只启动前端，http://localhost:5173 |
 | `pnpm build` | 构建前端静态文件到 `apps/web/dist` |
 | `pnpm check` | 前端语法自检（需要 pnpm store 里的 esbuild） |
+| `pnpm smoke` | 端到端冒烟：起临时后端、跑 18 项检查、删库退出 |
 
 启动后终端会显示：
 
@@ -308,7 +309,14 @@ server {
 
 ## 11. 改动后的自检清单
 
-改完代码，按这个顺序手工跑一遍（约 3 分钟）：
+先跑自动化那一步，全绿之后再手工看界面：
+
+```powershell
+pnpm check    # 前端全部模块的语法解析
+pnpm smoke    # 18 项端到端检查，约 10 秒，用临时数据库，不碰你的数据
+```
+
+接着按这个顺序手工跑一遍（约 3 分钟）：
 
 1. `pnpm dev` 能起来，打开 http://localhost:5173 不白屏
 2. 注册新邮箱 → 收到码（或日志里看到 `[mailer:console]`）
