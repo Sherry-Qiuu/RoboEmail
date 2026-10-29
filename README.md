@@ -61,9 +61,13 @@ node scripts/import_professors.mjs     # JSON -> SQLite
 
 导出脚本需要 pandas 和 openpyxl。称呼由 `apps/server/src/professors.ts` 按职称推导：教授 → Professor，副教授 / 助理教授 / 研究员 / 导师 → Dr，行政与技术岗用全名。
 
+## 部署
+
+Docker Compose 一把梭，完整步骤见 [`docs/deploy.md`](docs/deploy.md)：买服务器 → 配 DNS → `docker compose up -d --build`。
+
 ## 已知限制
 
 - 服务端用 Node 自带的 TypeScript 类型剥离直接运行，没有构建步骤，需要 Node 22.6 以上（推荐 24）。
 - 数据库用 Node 内置的 `node:sqlite`，同样要求较新的 Node，好处是不用编译原生模块。
 - 学习页需要登录，数据来自服务端 `/api/insights`。历史记录存在浏览器本地（IndexedDB），换浏览器不会跟过去，用「我的」页的导出带走。
-- 忘记密码链路还没做，密码忘了目前只能人工改库。
+- 忘记密码走邮件链接，链接里的域名由 `APP_ORIGIN` 决定，部署后记得改。

@@ -285,25 +285,11 @@ node scripts/import_professors.mjs
 
 ---
 
-## 10. 部署到服务器（简要）
+## 10. 部署到服务器
 
-1. 装 Node 24，`pnpm install`，`pnpm build`（生成 `apps/web/dist`）
-2. `.env`：`NODE_ENV=production`、`APP_ORIGIN=https://你的域名`
-3. 前端 `dist` 交给 Nginx 静态托管；`/api` 反代到 `127.0.0.1:8787`
-4. HTTPS 用 Caddy 或 Let's Encrypt
-5. 备份 `roboemail.db`
-6. 发信换自有域名，配 SPF / DKIM / DMARC，用 mail-tester.com 打分
+单独写了一份：[deploy.md](deploy.md)。Docker Compose 起 `app` + `caddy` 两个容器，Caddy 自动签证书。
 
-反向代理示例（Nginx）：
-
-```nginx
-server {
-  server_name roboemail.example.com;
-  root /srv/roboemail/apps/web/dist;
-  location / { try_files $uri /index.html; }
-  location /api/ { proxy_pass http://127.0.0.1:8787; proxy_set_header X-Forwarded-For $remote_addr; }
-}
-```
+一句话版本：DNS 指过去 → `docker compose up -d --build` → 改 `.env` 里的 `APP_ORIGIN` 和 `Caddyfile` 里的域名。
 
 ---
 

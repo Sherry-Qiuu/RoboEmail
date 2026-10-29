@@ -1,0 +1,19 @@
+# Reverse proxy and TLS in one file. Caddy fetches and renews the certificate
+# automatically once the domain resolves to this machine.
+#
+# Replace the domain below, and keep APP_ORIGIN in .env identical to it.
+
+roboemail.example.com {
+	encode zstd gzip
+
+	# The API also serves the built frontend, so a single upstream is enough.
+	reverse_proxy app:8787 {
+		header_up X-Forwarded-For {remote_host}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}

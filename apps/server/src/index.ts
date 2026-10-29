@@ -1,5 +1,8 @@
 import { randomBytes, randomInt } from 'node:crypto'
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { z } from 'zod'
@@ -441,6 +444,15 @@ app.post('/api/generate', optionalAuth, async (c) => {
 
 app.route('/api', learn)
 app.route('/api', people)
+
+// In production the built frontend sits next to the server, so one container can
+// serve both. In development Vite owns :5173 and this block does nothing.
+const webDist = resolve(import.meta.dirname, '../../web/dist')
+if (existsSync(webDist)) {
+  app.use('/*', serveStatic({ root: webDist }))
+  // Unknown paths belong to the single-page app, not to a 404.
+  app.get('*', serveStatic({ path: resolve(webDist, 'index.html') }))
+}
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404))
 
