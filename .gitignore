@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .pnpm-store/
+.tools/
 release/
 .data/
 
@@ -15,3 +16,4 @@ release/
 .env.local
 .DS_Store
 *.log
+*.docx
