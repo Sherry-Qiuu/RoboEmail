@@ -1,134 +1,101 @@
-# 部署
+# 部署与运维
 
-一台服务器 + 一个域名，用 Docker Compose 起两个容器：`app`（Node 跑 API 和前端）+ `caddy`（TLS 与反代）。
+这台机器已经在跑。下面是**实际生效**的步骤，不是通用教程——国内的网络环境让通用教程里的三条命令都会失败，修正写在第一节。
 
----
+## 0. 现状
 
-## 0. 需要准备
-
-| 项 | 说明 |
+| 项 | 值 |
 | --- | --- |
-| 服务器 | 香港 / 新加坡轻量，2 核 2G，约 288 元/年 |
-| 域名 | `.com` 约 80 元/年，不需要备案（服务器在境外） |
-| `.env` | 里面要有真实 SMTP 和 LLM key |
+| 服务器 | 腾讯云轻量，上海二区，2 核 2G / 3M 带宽 / 40G |
+| 公网 IP | `43.142.163.248` |
+| 系统 | Ubuntu 24.04 LTS |
+| 访问地址 | `http://43.142.163.248:8787`（备案期间，用 IP） |
+| 代码位置 | `/srv/roboemail` |
+| 数据库 | `/srv/roboemail/apps/server/data/roboemail.db` |
+| 运行方式 | Docker，只起 `app` 一个容器；`caddy` 等备案后再起 |
+
+## 1. 国内三处必踩的坑
+
+| 现象 | 原因 | 处理 |
+| --- | --- | --- |
+| `GET https://get.docker.com` 报 `Recv failure` | 被墙 | 改用 Ubuntu 自带的 `docker.io` |
+| `git clone github.com` 报 `GnuTLS recv error` | 被墙 | 加镜像前缀 `https://ghfast.top/` |
+| `docker pull node:24-slim` 报 `i/o timeout` | Docker Hub 被墙 | 配 `registry-mirrors` |
+| 构建时 `ERR_PNPM_IGNORED_BUILDS` | pnpm 11 把跳过安装脚本当失败 | 加 `--ignore-scripts` |
 
 ---
 
-## 1. DNS
-
-在域名服务商的解析页加两条 A 记录：
-
-```
-@      A   <服务器 IP>
-www    A   <服务器 IP>
-```
-
-等 5–30 分钟，用 `nslookup 你的域名` 确认已经指向服务器。**这一步没生效，Caddy 就签不下证书**，后面 `https` 会一直失败。
-
----
-
-## 2. 服务器装 Docker
-
-SSH 登进去（`ssh root@服务器IP`），然后：
+## 2. 从零重装（换机器时照抄）
 
 ```bash
-curl -fsSL https://get.docker.com | sh
+# 2.1 装 Docker
+sudo -i
+apt-get update
+apt-get install -y docker.io docker-compose-v2
 systemctl enable --now docker
-docker --version
-docker compose version
+docker --version && docker compose version
 ```
 
-两条命令都要有输出。没有 `compose` 子命令说明 docker 太旧，重装。
-
----
-
-## 3. 把代码放上去
-
-任选一种：
-
 ```bash
-# A. 从 GitHub（推荐，以后更新只要 git pull）
-git clone https://github.com/Sherry-Qiuu/roboemail.git /srv/roboemail
-
-# B. 本地打包再传
-scp roboemail.zip root@服务器IP:/srv/
+# 2.2 配镜像源，否则拉不到基础镜像
+mkdir -p /etc/docker && cat > /etc/docker/daemon.json <<'EOF'
+{
+  "registry-mirrors": [
+    "https://mirror.ccs.tencentyun.com",
+    "https://docker.m.daocloud.io",
+    "https://docker.1ms.run"
+  ]
+}
+EOF
+systemctl daemon-reload && systemctl restart docker
 ```
 
-放好之后：
-
 ```bash
-cd /srv/roboemail
+# 2.3 拉代码（GitHub 直连不通，走镜像）
+mkdir -p /srv && cd /srv
+git clone https://ghfast.top/https://github.com/Sherry-Qiuu/RoboEmail.git roboemail
+cd roboemail
 ```
 
----
-
-## 4. 配置
-
 ```bash
+# 2.4 配置
 cp .env.example .env
-nano .env
+nano .env          # 填 SMTP、LLM key；APP_ORIGIN 写 http://服务器IP:8787
+chmod 600 .env
 ```
 
-必须改的几项：
-
-```env
-NODE_ENV=production
-APP_ORIGIN=https://rbem.online
-
-SMTP_HOST=smtp.qq.com
-SMTP_USER=你的邮箱
-SMTP_PASS=授权码
-
-LLM_BASE_URL=https://api.deepseek.com/v1
-LLM_API_KEY=sk-...
-LLM_MODEL=deepseek-chat
+```bash
+# 2.5 构建并启动（只起 app，caddy 用不上）
+nohup docker compose up -d --build app > build.log 2>&1 &
+tail -f build.log
 ```
 
-`Caddyfile` 里已经写好了 `rbem.online, www.rbem.online`，换域名时才需要改。
+> 服务器 SSH 会不定期断线。用 `nohup ... &` 让构建在后台跑，断了也不影响，重连后 `tail -f build.log` 继续看。
 
-**`APP_ORIGIN` 必须写成 `https://rbem.online`**，和 Caddyfile 里的域名一致，否则密码重置邮件里的链接会指向错误地址。
+**防火墙**：控制台 → 防火墙 → 放行 `TCP:8787`（22/80/443 默认已开）。
 
 ---
 
-## 5. 启动
+## 3. 日常运维
 
 ```bash
-docker compose up -d --build
-```
+# 看是否在跑
+docker compose ps
 
-第一次要装依赖 + 编译前端，约 3–5 分钟。看日志：
-
-```bash
+# 看日志（Ctrl+C 只退出查看，不影响服务）
 docker compose logs -f app
+
+# 重启（改完 .env 必须重启）
+docker compose restart app
+
+# 备份数据库
+cp apps/server/data/roboemail.db /srv/backup-$(date +%F).db
 ```
 
-看到 `roboemail server  http://127.0.0.1:8787` 就成了，`Ctrl+C` 退出日志（不会停服务）。
-
-Caddy 签证书可能要几十秒：
+**每天自动备份**：
 
 ```bash
-docker compose logs -f caddy
-```
-
-出现 `certificate obtained successfully` 就绪。
-
----
-
-## 6. 验证
-
-1. 浏览器打开 `https://你的域名` —— 应该是落地页
-2. `https://你的域名/api/health` —— 返回 `{"ok":true,...}`，`provider` 应该是你的模型名而不是 `mock`
-3. 注册一个账号，真的能收到验证码
-4. 走一遍忘记密码，确认邮件里的链接是 `https://你的域名/reset?...`
-
----
-
-## 7. 备份
-
-数据库在 `apps/server/data/roboemail.db`，容器通过 volume 挂到了宿主机。加一条定时任务：
-
-```bash
-crontab -e
+mkdir -p /srv/backup && crontab -e
 ```
 
 ```cron
@@ -136,40 +103,50 @@ crontab -e
 0 4 * * * find /srv/backup -name 'roboemail-*.db' -mtime +14 -delete
 ```
 
-每天 3 点备份，保留 14 天。`/srv/backup` 要先 `mkdir -p`。
-
----
-
-## 8. 更新
+**更新代码**：
 
 ```bash
 cd /srv/roboemail
 git pull
-docker compose up -d --build
+docker compose up -d --build app
 ```
 
-数据库不会被覆盖（在 volume 里）。
+数据库在 volume 里，重新构建不会丢。
 
 ---
 
-## 9. 常见问题
+## 4. 备案通过后切到域名 + HTTPS
+
+```bash
+# 4.1 DNS 加两条 A 记录：@ 和 www → 43.142.163.248
+# 4.2 改 .env 里的 APP_ORIGIN
+nano .env        # APP_ORIGIN=https://rbem.online
+```
+
+```bash
+# 4.3 起 Caddy（自动申请证书，Caddyfile 里已写好 rbem.online）
+docker compose up -d
+docker compose logs -f caddy     # 等 "certificate obtained successfully"
+```
+
+```bash
+# 4.4 可选：关掉 8787 的对外映射
+# 编辑 docker-compose.yml，删掉 app 服务下 ports 那两行，然后
+docker compose up -d
+```
+
+之后访问 `https://rbem.online`。
+
+---
+
+## 5. 排错
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
-| 打开 https 超时 | DNS 没生效，或 80/443 被防火墙挡 | `nslookup` 确认解析；云厂商控制台放行 80/443 |
-| `certificate obtain failed` | 域名没指向本机，或 80 端口不通 | 先修 DNS；Caddy 走 HTTP-01 验证需要 80 |
-| 502 Bad Gateway | app 容器没起来 | `docker compose logs app` 看报错 |
-| 页面是旧的 | 浏览器缓存，或没重新 build | `docker compose up -d --build` 后强刷 |
-| `database is locked` | 起了两个容器实例 | `docker compose down` 再 `up` |
-| 验证码进垃圾箱 | 发件域名不是你自己的 | 换自有域名并配 SPF/DKIM/DMARC，见 `usage.md` 第 6 节 |
-| 注册报 500 | SMTP 配置不对 | 看 `docker compose logs app` 里 `[mailer:smtp] failed` |
-
----
-
-## 10. 安全清单
-
-- [ ] `.env` 权限 `chmod 600`，不要提交到仓库
-- [ ] 服务器 SSH 改端口 / 禁用密码登录（可选）
-- [ ] `NODE_ENV=production`（cookie 才会带 `secure`，接口不再返回 `devCode`）
-- [ ] 云厂商安全组只放行 22 / 80 / 443
-- [ ] 定期看 `docker compose logs` 有没有异常
+| 浏览器超时，容器是 Up | 防火墙没放行 8787 | 控制台补规则 |
+| `i/o timeout` 拉镜像 | 镜像源没生效 | `docker info \| grep -A3 Mirror` 检查 |
+| 构建报 `ERR_PNPM_IGNORED_BUILDS` | Dockerfile 漏了 `--ignore-scripts` | 见 2.1 |
+| 502 / 容器起不来 | 看日志 | `docker compose logs app` |
+| 验证码收不到 | SMTP 配置错 | 日志里搜 `[mailer:smtp] failed` |
+| 页面能开但模型没反应 | key 错或过期 | 日志搜 `[polish]`；访问 `/api/health` 看 provider |
+| `database is locked` | 起了两个实例 | `docker compose down` 再 `up` |

@@ -1,11 +1,10 @@
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-BODY_FONT = "微软雅黑"
-CODE_FONT = "Consolas"
+FONT = "微软雅黑"
+CODE = "Consolas"
 INK = RGBColor(0x1A, 0x1A, 0x1A)
 MUTED = RGBColor(0x66, 0x66, 0x66)
 
@@ -18,30 +17,28 @@ def set_font(run, name, size, bold=False, color=INK):
     run._element.rPr.rFonts.set(qn("w:eastAsia"), name)
 
 
-def para(doc, text, size=10.5, bold=False, color=INK, space_after=4, align=None):
+def para(doc, text, size=10.5, bold=False, color=INK, space_after=4):
     p = doc.add_paragraph()
     p.paragraph_format.space_after = Pt(space_after)
     p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.line_spacing = 1.15
-    if align is not None:
-        p.alignment = align
-    set_font(p.add_run(text), BODY_FONT, size, bold, color)
+    p.paragraph_format.line_spacing = 1.2
+    set_font(p.add_run(text), FONT, size, bold, color)
     return p
 
 
 def heading(doc, text):
     p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(10)
-    p.paragraph_format.space_after = Pt(4)
-    set_font(p.add_run(text), BODY_FONT, 12, True)
+    p.paragraph_format.space_before = Pt(9)
+    p.paragraph_format.space_after = Pt(3)
+    set_font(p.add_run(text), FONT, 12, True)
     return p
 
 
 def bullet(doc, text):
     p = doc.add_paragraph(style="List Bullet")
     p.paragraph_format.space_after = Pt(2)
-    p.paragraph_format.line_spacing = 1.15
-    set_font(p.add_run(text), BODY_FONT, 10.5)
+    p.paragraph_format.line_spacing = 1.2
+    set_font(p.add_run(text), FONT, 10.5)
     return p
 
 
@@ -52,7 +49,7 @@ def code(doc, lines):
         p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.line_spacing = 1.05
         p.paragraph_format.left_indent = Cm(0.4)
-        set_font(p.add_run(line), CODE_FONT, 9, color=RGBColor(0x22, 0x22, 0x22))
+        set_font(p.add_run(line), CODE, 9, color=RGBColor(0x22, 0x22, 0x22))
 
 
 def table(doc, rows, widths):
@@ -66,7 +63,7 @@ def table(doc, rows, widths):
             cp = cells[col].paragraphs[0]
             cp.paragraph_format.space_after = Pt(1)
             cp.paragraph_format.space_before = Pt(1)
-            set_font(cp.add_run(value), BODY_FONT, 9.5, bold=(index == 0))
+            set_font(cp.add_run(value), FONT, 9.5, bold=(index == 0))
     return t
 
 
@@ -79,107 +76,39 @@ section.right_margin = Cm(2.0)
 
 title = doc.add_paragraph()
 title.paragraph_format.space_after = Pt(2)
-set_font(title.add_run("RoboEmail 上线操作清单"), BODY_FONT, 19, True)
+set_font(title.add_run("RoboEmail 上线记录与运维手册"), FONT, 19, True)
 
-para(
-    doc,
-    "2026-10-29 · 全程约 40 分钟（不含域名实名审核的等待）· 详细版见 docs/deploy.md",
-    9,
-    color=MUTED,
-    space_after=8,
-)
+para(doc, "2026-10-29 · 已上线 · 腾讯云轻量 上海二区", 9, color=MUTED, space_after=8)
 
-heading(doc, "一、开始之前")
-bullet(doc, "身份证、微信/支付宝、邮箱、手机，放在手边")
-bullet(doc, "已经准备好的：GitHub 仓库 RoboEmail、DeepSeek key、QQ 邮箱授权码")
-
-heading(doc, "二、先买域名（要等实名审核，所以放第一步）")
-bullet(doc, "打开 dnspod.cloud.tencent.com，搜一个 .com，约 60–90 元/年")
-bullet(doc, "填「域名信息模板」时，姓名和身份证号必须与实名信息完全一致")
-bullet(doc, "付款后到「我的域名」看状态，等「实名认证中」变成「正常」才能解析")
-
-heading(doc, "三、买服务器")
+heading(doc, "一、现状")
 table(
     doc,
     [
-        ("项目", "选什么"),
-        ("产品", "轻量应用服务器"),
-        ("地域", "中国香港（不需要备案）"),
-        ("镜像", "Ubuntu 24.04 LTS，选纯净系统，不要应用镜像"),
-        ("配置", "2 核 2G / 40G SSD / 20M 带宽"),
-        ("时长", "1 年，约 288 元"),
-        ("登录凭证", "设一个 root 密码，立刻记进记事本"),
+        ("项", "值"),
+        ("公网 IP", "43.142.163.248"),
+        ("访问地址", "http://43.142.163.248:8787（备案期间用 IP）"),
+        ("服务器", "2 核 2G / 3M 带宽 / 40G，Ubuntu 24.04"),
+        ("代码位置", "/srv/roboemail"),
+        ("数据库", "apps/server/data/roboemail.db"),
+        ("运行方式", "Docker，只起 app 容器；caddy 等备案后再起"),
     ],
-    [3.2, 13.0],
+    [3.0, 13.2],
 )
+para(doc, "健康检查：curl http://43.142.163.248:8787/api/health，provider 应为 deepseek-chat。", 9.5, color=MUTED, space_after=2)
 
-heading(doc, "四、放行端口和解析域名")
-bullet(doc, "控制台 → 防火墙：确认 22、80、443 三条都是「允许」")
-bullet(doc, "DNS 解析加两条 A 记录：主机记录 @ 和 www，记录值填服务器公网 IP")
-bullet(doc, "等 5–10 分钟，在你自己的电脑上执行下面这行，返回的地址是服务器 IP 才算生效")
-code(doc, ["nslookup 你的域名"])
-
-heading(doc, "五、连服务器、装 Docker")
+heading(doc, "二、日常运维")
 code(
     doc,
     [
-        "ssh root@你的服务器IP",
-        "curl -fsSL https://get.docker.com | sh",
-        "systemctl enable --now docker",
-        "docker compose version",
+        "cd /srv/roboemail",
+        "docker compose ps                  # 是否在跑",
+        "docker compose logs -f app         # 看日志，Ctrl+C 只退出查看",
+        "docker compose restart app         # 改完 .env 必须重启",
     ],
 )
-para(doc, "最后一行要显示出 v2.x 的版本号，没有输出说明装失败了。", 9.5, color=MUTED, space_after=2)
 
-heading(doc, "六、部署")
-code(
-    doc,
-    [
-        "mkdir -p /srv && cd /srv",
-        "git clone https://github.com/Sherry-Qiuu/RoboEmail.git roboemail",
-        "cd roboemail",
-        "cp .env.example .env && nano .env",
-    ],
-)
-para(
-    doc,
-    "在 nano 里改四项：NODE_ENV=production、APP_ORIGIN=https://你的域名、SMTP_USER / SMTP_PASS、LLM_API_KEY。"
-    "存盘用 Ctrl+O 回车，退出用 Ctrl+X。",
-    9.5,
-    color=MUTED,
-    space_after=2,
-)
-code(
-    doc,
-    [
-        "nano Caddyfile      # 第一行换成你的域名，同样 Ctrl+O 回车、Ctrl+X",
-        "chmod 600 .env",
-        "docker compose up -d --build",
-    ],
-)
-para(doc, "第一次要编译前端，等 3–5 分钟。结束后跑 docker compose ps，两个服务都应是 running。", 9.5, color=MUTED, space_after=2)
-
-heading(doc, "七、验收四条")
-bullet(doc, "打开 https://你的域名，是落地页，地址栏有小锁")
-bullet(doc, "打开 https://你的域名/api/health，provider 显示 deepseek-chat 而不是 mock")
-bullet(doc, "注册一个账号，真的收到验证码")
-bullet(doc, "点忘记密码，邮件里的链接是 https://你的域名/reset?...")
-
-heading(doc, "八、最容易翻车的三处")
-table(
-    doc,
-    [
-        ("现象", "原因", "处理"),
-        ("浏览器超时，但容器是 running", "防火墙没放行 80/443", "控制台防火墙补规则"),
-        ("日志里 certificate obtain failed", "DNS 还没生效", "等 10 分钟，docker compose restart caddy"),
-        ("只有重置邮件链接是错的", "APP_ORIGIN 和域名不一致", "改成完全一致后重启 app"),
-    ],
-    [5.4, 4.6, 6.2],
-)
-
-heading(doc, "九、上线之后")
-bullet(doc, "关掉本地那台机器上的临时隧道，别让开发环境长期挂在公网上")
-bullet(doc, "数据库每天自动备份，先建目录再写定时任务")
+heading(doc, "三、备份与更新")
+bullet(doc, "每天自动备份数据库，保留 14 天")
 code(
     doc,
     [
@@ -188,12 +117,46 @@ code(
         "0 4 * * * find /srv/backup -name 'roboemail-*.db' -mtime +14 -delete",
     ],
 )
-para(doc, "每天 3 点备份，保留 14 天。", 9.5, color=MUTED, space_after=4)
-bullet(doc, "以后改了代码，本地 push 之后在服务器执行两行就更新完，数据库不会被覆盖")
-code(doc, ["cd /srv/roboemail", "git pull && docker compose up -d --build"])
+bullet(doc, "改了代码之后")
+code(doc, ["cd /srv/roboemail && git pull && docker compose up -d --build app"])
 
-heading(doc, "十、做完发我")
-para(doc, "服务器公网 IP、域名、以及卡在哪一步。密码和 key 不用发。", 10.5, space_after=2)
+heading(doc, "四、备案通过后切域名 + HTTPS")
+bullet(doc, "DNS 加两条 A 记录：@ 和 www 都指向 43.142.163.248")
+bullet(doc, "把 .env 里的 APP_ORIGIN 改成 https://rbem.online")
+bullet(doc, "起 Caddy，它会自动申请并续期证书（Caddyfile 已写好 rbem.online）")
+code(doc, ["docker compose up -d", "docker compose logs -f caddy   # 等 certificate obtained"])
+para(doc, "看到证书成功就可以用 https://rbem.online 访问，8787 端口可以从 compose 里删掉。", 9.5, color=MUTED, space_after=2)
+
+heading(doc, "五、国内必踩的四个坑（已解决）")
+table(
+    doc,
+    [
+        ("现象", "原因", "处理"),
+        ("get.docker.com 连接被重置", "被墙", "改用 apt 装 docker.io"),
+        ("git clone 报 GnuTLS 错误", "GitHub 被墙", "前缀加 https://ghfast.top/"),
+        ("拉镜像 i/o timeout", "Docker Hub 被墙", "配 registry-mirrors 腾讯云源"),
+        ("构建报 ERR_PNPM_IGNORED_BUILDS", "pnpm 11 严格模式", "install 加 --ignore-scripts"),
+    ],
+    [5.6, 3.8, 6.8],
+)
+
+heading(doc, "六、排错")
+table(
+    doc,
+    [
+        ("现象", "处理"),
+        ("浏览器超时但容器 Up", "控制台防火墙放行 TCP:8787"),
+        ("验证码收不到", "日志搜 [mailer:smtp] failed，检查 SMTP_PASS 是授权码不是密码"),
+        ("页面能开但模型没反应", "日志搜 [polish]；看 /api/health 的 provider 是不是 deepseek-chat"),
+        ("database is locked", "docker compose down 再 up，别开两个实例"),
+    ],
+    [4.6, 11.6],
+)
+
+heading(doc, "七、下一步")
+bullet(doc, "备案：腾讯云控制台顶部「备案」→ 首次备案 → 网站名称写「个人邮件写作工具」")
+bullet(doc, "等备案期间继续用 IP 访问，不要把域名解析过去")
+bullet(doc, "通过后按第四节切 HTTPS")
 
 doc.save(r"E:\UNNC_Y1_FAM\RoboEmail\RoboEmail-上线清单.docx")
 print("saved")
