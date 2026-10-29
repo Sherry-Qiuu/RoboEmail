@@ -73,7 +73,7 @@ nano .env
 
 ```env
 NODE_ENV=production
-APP_ORIGIN=https://你的域名
+APP_ORIGIN=https://rbem.online
 
 SMTP_HOST=smtp.qq.com
 SMTP_USER=你的邮箱
@@ -84,15 +84,9 @@ LLM_API_KEY=sk-...
 LLM_MODEL=deepseek-chat
 ```
 
-再改 `Caddyfile` 第一行的域名：
+`Caddyfile` 里已经写好了 `rbem.online, www.rbem.online`，换域名时才需要改。
 
-```
-你的域名 {
-	...
-}
-```
-
-**`APP_ORIGIN` 和 Caddyfile 里的域名必须完全一样**，否则密码重置邮件里的链接会指向错误地址。
+**`APP_ORIGIN` 必须写成 `https://rbem.online`**，和 Caddyfile 里的域名一致，否则密码重置邮件里的链接会指向错误地址。
 
 ---
 

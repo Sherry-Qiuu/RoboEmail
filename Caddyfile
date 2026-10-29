@@ -1,9 +1,10 @@
 # Reverse proxy and TLS in one file. Caddy fetches and renews the certificate
 # automatically once the domain resolves to this machine.
 #
-# Replace the domain below, and keep APP_ORIGIN in .env identical to it.
+# The domain must match APP_ORIGIN in .env, otherwise the reset link in the
+# password mail points somewhere else.
 
-roboemail.example.com {
+rbem.online, www.rbem.online {
 	encode zstd gzip
 
 	# The API also serves the built frontend, so a single upstream is enough.
