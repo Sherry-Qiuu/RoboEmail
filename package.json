@@ -1,0 +1,17 @@
+{
+  "name": "roboemail",
+  "private": true,
+  "packageManager": "pnpm@11.28.5",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "node dev.mjs",
+    "dev:server": "node --watch apps/server/src/index.ts",
+    "dev:web": "node apps/web/node_modules/vite/bin/vite.js",
+    "build": "node apps/web/node_modules/vite/bin/vite.js build",
+    "check": "node scripts/check_frontend.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "professors": "node scripts/import_professors.mjs"
+  }
+}

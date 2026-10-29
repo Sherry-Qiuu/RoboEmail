@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.pnpm-store/
+release/
+.data/
+
+# scraped HTML dumps behind the staff-directory rebuild; large and regenerable
+/data/
+/data_business/
+/data_fhss/
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.local
+.DS_Store
+*.log
