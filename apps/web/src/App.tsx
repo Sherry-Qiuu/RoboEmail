@@ -151,6 +151,19 @@ export function App() {
           </>
         )}
       </main>
+
+      <footer className="mx-auto max-w-[820px] px-6 pb-10">
+        <div className="border-t border-rule pt-5 text-center">
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-[11px] text-faint transition-colors hover:text-ink"
+          >
+            浙ICP备2026097271号
+          </a>
+        </div>
+      </footer>
     </div>
   )
 }
