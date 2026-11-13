@@ -18,3 +18,25 @@ rbem.online, www.rbem.online {
 		Referrer-Policy "strict-origin-when-cross-origin"
 	}
 }
+
+# Second site on the same box (Morrow). It runs in its own compose project and
+# joins this project's default network, so the container name is resolvable
+# here. Caddy still owns 80/443; Morrow publishes nothing to the host.
+#
+# Only add this block once calhub.asia resolves to this server, otherwise Caddy
+# keeps retrying a certificate it cannot get.
+calhub.asia {
+	encode zstd gzip
+
+	reverse_proxy morrow:8000 {
+		# Morrow's AI panel streams over SSE; buffering would break it.
+		flush_interval -1
+		header_up X-Forwarded-For {remote_host}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
