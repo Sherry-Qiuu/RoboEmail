@@ -67,7 +67,7 @@ export function App() {
               教授
             </button>
             <button className={navClass(view === 'me')} onClick={() => setView('me')}>
-              我的
+              历史记录
             </button>
             <button className={navClass(view === 'learn')} onClick={() => setView('learn')}>
               学习

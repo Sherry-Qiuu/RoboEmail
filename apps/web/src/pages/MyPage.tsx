@@ -69,7 +69,7 @@ export function MyPage() {
 
   return (
     <section>
-      <h1 className="font-display text-[32px] leading-none tracking-tight">我的</h1>
+      <h1 className="font-display text-[32px] leading-none tracking-tight">历史记录</h1>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <button className="btn btn-ghost" onClick={() => download(items)} disabled={items.length === 0}>
