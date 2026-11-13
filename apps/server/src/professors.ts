@@ -1,4 +1,8 @@
-import { db } from './db.ts'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { db, newId, nowIso } from './db.ts'
+
+const SEED_FILE = resolve(import.meta.dirname, '../data/professors.json')
 
 export type ProfessorRow = {
   id: string
@@ -93,4 +97,79 @@ export function listProfessors(limit = 1000): ProfessorRow[] {
 export function countProfessors(): number {
   const row = db.prepare('SELECT COUNT(*) AS n FROM professors').get() as { n: number }
   return row.n
+}
+
+type SeedRow = {
+  nameEn: string
+  surname: string
+  titleCn: string
+  titleEn?: string
+  school?: string
+  department?: string
+  email?: string | null
+  profileUrl?: string | null
+  sourceUrl?: string | null
+}
+
+/**
+ * The directory ships with the app as JSON. A fresh database has an empty
+ * table, so import it once on boot instead of asking the operator to run a
+ * script by hand — that step is easy to forget and silently leaves the page
+ * blank.
+ */
+export function seedProfessors(): number {
+  const existing = countProfessors()
+  if (existing > 0) return existing
+
+  let rows: SeedRow[]
+  try {
+    rows = JSON.parse(readFileSync(SEED_FILE, 'utf8')) as SeedRow[]
+  } catch (error) {
+    console.warn('[professors] seed file unreadable:', (error as Error).message)
+    return 0
+  }
+
+  const insert = db.prepare(
+    `INSERT INTO professors
+       (id, name_en, surname, name_zh, name_pinyin, title, salutation_override,
+        school, department, email, role, modules, profile_url, source_url, updated_at)
+     VALUES (?, ?, ?, NULL, NULL, ?, NULL, ?, ?, ?, ?, NULL, ?, ?, ?)`,
+  )
+
+  const seen = new Set<string>()
+  const now = nowIso()
+  let added = 0
+
+  db.exec('BEGIN')
+  try {
+    for (const row of rows) {
+      const email = row.email ?? null
+      if (email) {
+        if (seen.has(email)) continue
+        seen.add(email)
+      }
+      insert.run(
+        newId(),
+        row.nameEn,
+        row.surname,
+        row.titleCn,
+        row.school ?? null,
+        row.department || null,
+        email,
+        row.titleEn || null,
+        row.profileUrl ?? null,
+        row.sourceUrl ?? null,
+        now,
+      )
+      added += 1
+    }
+    db.exec('COMMIT')
+  } catch (error) {
+    db.exec('ROLLBACK')
+    console.warn('[professors] seed failed:', (error as Error).message)
+    return countProfessors()
+  }
+
+  console.log(`[professors] seeded ${added} rows from ${SEED_FILE}`)
+  return added
 }

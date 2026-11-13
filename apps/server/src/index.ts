@@ -29,6 +29,7 @@ import { mailer } from './mailer.ts'
 import { runGenerate, type GenerateFields } from './generate.ts'
 import { runPolish } from './polish.ts'
 import { fail, readBody } from './http.ts'
+import { countProfessors, seedProfessors } from './professors.ts'
 import { learn } from './routes/learn.ts'
 import { people } from './routes/people.ts'
 
@@ -456,7 +457,12 @@ if (existsSync(webDist)) {
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404))
 
+// A fresh database has an empty directory; import the bundled list once so the
+// professor page is never blank after a deploy.
+seedProfessors()
+
 serve({ fetch: app.fetch, port: env.port }, (info) => {
   console.log(`roboemail server  http://127.0.0.1:${info.port}`)
   console.log(`provider            ${env.llm.apiKey ? env.llm.model : 'mock (no LLM_API_KEY)'}`)
+  console.log(`professors          ${countProfessors()}`)
 })
