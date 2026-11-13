@@ -7,9 +7,10 @@ import { MyPage } from './pages/MyPage'
 import { PeoplePage } from './pages/PeoplePage'
 import { PolishPage } from './pages/PolishPage'
 import { ResetPage } from './pages/ResetPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { WritePage } from './pages/WritePage'
 
-type View = 'home' | 'write' | 'polish' | 'auth' | 'me' | 'learn' | 'people'
+type View = 'home' | 'write' | 'polish' | 'auth' | 'me' | 'learn' | 'people' | 'settings'
 
 function navClass(active: boolean): string {
   return `transition-colors ${active ? 'text-ink' : 'text-muted hover:text-ink'}`
@@ -31,12 +32,6 @@ export function App() {
       .then((res) => setUser(res.user))
       .catch(() => undefined)
   }, [])
-
-  async function logout() {
-    await api.logout().catch(() => undefined)
-    setUser(null)
-    setView('home')
-  }
 
   return (
     <div className="min-h-screen">
@@ -79,7 +74,10 @@ export function App() {
             </button>
             <span className="h-3 w-px bg-rule" />
             {user ? (
-              <button className="text-muted transition-colors hover:text-ink" onClick={logout}>
+              <button
+                className={navClass(view === 'settings')}
+                onClick={() => setView('settings')}
+              >
                 {user.username}
               </button>
             ) : (
@@ -144,7 +142,16 @@ export function App() {
             }}
           />
         )}
-        {view === 'me' && <MyPage signedIn={Boolean(user)} />}
+        {view === 'me' && <MyPage />}
+        {view === 'settings' && user && (
+          <SettingsPage
+            user={user}
+            onLoggedOut={() => {
+              setUser(null)
+              setView('home')
+            }}
+          />
+        )}
         {view === 'learn' && (
           <LearnPage signedIn={Boolean(user)} onNeedAccount={() => setView('auth')} />
         )}

@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { api } from '../api'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { history, type HistoryEntry } from '../store'
 
 function formatDate(value: number): string {
@@ -21,15 +20,11 @@ function download(entries: HistoryEntry[]): void {
   URL.revokeObjectURL(url)
 }
 
-export function MyPage({ signedIn }: { signedIn: boolean }) {
+export function MyPage() {
   const [items, setItems] = useState<HistoryEntry[]>([])
   const [ready, setReady] = useState(false)
   const [copied, setCopied] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
-  const [current, setCurrent] = useState('')
-  const [next, setNext] = useState('')
-  const [notice, setNotice] = useState('')
-  const [saving, setSaving] = useState(false)
 
   async function refresh() {
     setItems(await history.list())
@@ -69,22 +64,6 @@ export function MyPage({ signedIn }: { signedIn: boolean }) {
       window.alert('这个文件读不出来，可能是导出的格式不对。')
     } finally {
       event.target.value = ''
-    }
-  }
-
-  async function changePassword(event: FormEvent) {
-    event.preventDefault()
-    setSaving(true)
-    setNotice('')
-    try {
-      await api.changePassword(current, next)
-      setCurrent('')
-      setNext('')
-      setNotice('密码改好了，其他设备已退出')
-    } catch (cause) {
-      setNotice(cause instanceof Error ? cause.message : '出错了')
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -150,38 +129,6 @@ export function MyPage({ signedIn }: { signedIn: boolean }) {
           </li>
         ))}
       </ul>
-
-      {signedIn && (
-        <div className="mt-16 border-t border-rule pt-8">
-          <span className="label">修改密码</span>
-          <form onSubmit={changePassword} className="mt-3 max-w-[320px] space-y-3">
-            <div>
-              <span className="text-[12px] text-faint">当前密码</span>
-              <input
-                type="password"
-                value={current}
-                onChange={(event) => setCurrent(event.target.value)}
-                className="field mt-1"
-                autoComplete="current-password"
-              />
-            </div>
-            <div>
-              <span className="text-[12px] text-faint">新密码</span>
-              <input
-                type="password"
-                value={next}
-                onChange={(event) => setNext(event.target.value)}
-                className="field mt-1"
-                autoComplete="new-password"
-              />
-            </div>
-            {notice && <p className="text-[12px] text-muted">{notice}</p>}
-            <button className="btn btn-ghost" disabled={saving || !current || next.length < 8}>
-              {saving ? '保存中…' : '保存'}
-            </button>
-          </form>
-        </div>
-      )}
     </section>
   )
 }
