@@ -10,10 +10,8 @@ services:
       PORT: 8787
     volumes:
       - ./apps/server/data:/app/apps/server/data
-    # Published so the site is reachable by IP while the domain is not yet
-    # filed. Remove this line once HTTPS through Caddy is working.
-    ports:
-      - '8787:8787'
+    # No published port: the app is only reachable through Caddy over the
+    # compose network, so plain HTTP cannot bypass HTTPS.
 
   caddy:
     image: caddy:2-alpine
