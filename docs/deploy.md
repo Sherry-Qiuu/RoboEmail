@@ -85,22 +85,30 @@ docker compose ps
 # 看日志（Ctrl+C 只退出查看，不影响服务）
 docker compose logs -f app
 
-# 重启（改完 .env 必须重启）
-docker compose restart app
-
-# 备份数据库
-cp apps/server/data/roboemail.db /srv/backup-$(date +%F).db
+# 改完 .env 用这个重建。restart 只重启进程，不会重新读 .env
+docker compose up -d --force-recreate app
 ```
 
-**每天自动备份**：
+**每天自动备份**（`VACUUM INTO` 生成一致快照，比直接 `cp` 安全，因为库开了 WAL）：
 
 ```bash
-mkdir -p /srv/backup && crontab -e
+cat > /srv/backup.sh <<'EOF'
+#!/bin/sh
+set -e
+STAMP=$(date +%F)
+cd /srv/roboemail
+docker compose exec -T app node -e "const{DatabaseSync}=require('node:sqlite');new DatabaseSync('/app/apps/server/data/roboemail.db').exec(\"VACUUM INTO '/app/apps/server/data/snapshot.db'\")"
+mkdir -p /srv/backup
+mv apps/server/data/snapshot.db /srv/backup/roboemail-$STAMP.db
+find /srv/backup -name 'roboemail-*.db' -mtime +14 -delete
+echo "$(date '+%F %T') backup ok"
+EOF
+chmod +x /srv/backup.sh
+/srv/backup.sh
 ```
 
-```cron
-0 3 * * * cp /srv/roboemail/apps/server/data/roboemail.db /srv/backup/roboemail-$(date +\%F).db
-0 4 * * * find /srv/backup -name 'roboemail-*.db' -mtime +14 -delete
+```bash
+( crontab -l 2>/dev/null; echo "0 3 * * * /srv/backup.sh >> /srv/backup.log 2>&1" ) | crontab -
 ```
 
 **更新代码**：
