@@ -130,12 +130,19 @@ docker compose logs -f caddy     # 等 "certificate obtained successfully"
 ```
 
 ```bash
-# 4.4 可选：关掉 8787 的对外映射
-# 编辑 docker-compose.yml，删掉 app 服务下 ports 那两行，然后
-docker compose up -d
+# 4.4 关掉 8787 的对外映射（仓库里已经是关的，这一节只说明原因）
+# 只保留 Caddy 的 80/443，所有流量都必须走 HTTPS
 ```
 
 之后访问 `https://rbem.online`。
+
+部署完从本机跑一次外部检查（端口、证书、接口、备案号）：
+
+```bash
+node scripts/verify-live.mjs
+```
+
+八项全 `ok` 才算真的上线。
 
 ---
 

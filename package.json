@@ -12,6 +12,7 @@
     "build": "node scripts/vite.mjs build",
     "check": "node scripts/check_frontend.mjs",
     "smoke": "node scripts/smoke.mjs",
+    "verify:live": "node scripts/verify-live.mjs",
     "professors": "node scripts/import_professors.mjs"
   }
 }
