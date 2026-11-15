@@ -10,7 +10,7 @@ import { SlotText, fillSlots } from '../components/SlotText'
 import { TrialNote } from '../components/TrialNote'
 import { VoiceButton } from '../components/VoiceButton'
 import { readDraft, writeDraft } from '../draft'
-import { firstLine, remember } from '../store'
+import { summaryLine, remember } from '../store'
 
 const PURPOSES = [
   { id: 'inquiry', label: '询问信息' },
@@ -123,7 +123,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
       setSlotValues({})
       remember(response.trial, {
         mode: 'generate',
-        title: firstLine(response.result.subject_options[0] ?? '', '写邮件'),
+        title: summaryLine(response.result.subject_options[0] ?? '', '写邮件'),
         text: fillSlots(composeBody(response.result), {}),
         meta: `${response.result.paragraphs.length} 段`,
         payload: response,

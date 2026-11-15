@@ -1,5 +1,16 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { history, type HistoryEntry } from '../store'
+import { history, summaryLine, type HistoryEntry } from '../store'
+
+/**
+ * Generated mail stores the subject line, which reads well on its own. Polished
+ * mail stores whatever the model returned, whose first line is a salutation, so
+ * the preview is derived from the body instead — this also repairs rows saved
+ * before the preview rule existed.
+ */
+function previewOf(entry: HistoryEntry): string {
+  if (entry.mode === 'generate' && entry.title.trim()) return entry.title
+  return summaryLine(entry.text, entry.title || '润色')
+}
 
 function formatDate(value: number): string {
   return new Date(value).toLocaleString('zh-CN', {
@@ -105,7 +116,7 @@ export function MyPage() {
                   {formatDate(entry.createdAt)} · {entry.mode === 'polish' ? '润色' : '写邮件'} ·{' '}
                   {entry.meta}
                 </span>
-                <p className="mt-1 truncate text-[14px]">{entry.title}</p>
+                <p className="mt-1 truncate text-[14px]">{previewOf(entry)}</p>
               </div>
               <div className="flex shrink-0 items-center gap-3 text-[12px]">
                 <button className="text-muted transition-colors hover:text-ink" onClick={() => copy(entry)}>

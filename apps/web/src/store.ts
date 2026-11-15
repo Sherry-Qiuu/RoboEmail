@@ -78,10 +78,4 @@ export function remember(
   void history.add(entry).catch(() => undefined)
 }
 
-export function firstLine(text: string, fallback: string): string {
-  const line = text
-    .split('\n')
-    .map((item) => item.trim())
-    .find(Boolean) ?? fallback
-  return line.length > 60 ? `${line.slice(0, 60)}…` : line
-}
+export { summaryLine } from './summary.ts'

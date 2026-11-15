@@ -4,7 +4,7 @@ import { DiffText } from '../components/DiffText'
 import { TrialNote } from '../components/TrialNote'
 import { VoiceButton } from '../components/VoiceButton'
 import { readDraft, writeDraft } from '../draft'
-import { firstLine, remember } from '../store'
+import { summaryLine, remember } from '../store'
 
 const RECIPIENTS = ['教授', '导师', '教务行政', '同学', '其他']
 
@@ -49,7 +49,7 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
       setData(response)
       remember(response.trial, {
         mode: 'polish',
-        title: firstLine(response.result.revised, '润色'),
+        title: summaryLine(response.result.revised, '润色'),
         text: response.result.revised,
         meta: `${response.result.changes.length} 处改动`,
         payload: response,
