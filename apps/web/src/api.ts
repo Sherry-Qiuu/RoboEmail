@@ -212,10 +212,10 @@ export const api = {
       body: JSON.stringify({ text, context }),
     }),
 
-  generate: (purpose: string, fields: GenerateFields) =>
+  generate: (purposes: string[], fields: GenerateFields) =>
     request<GenerateResponse>('/api/generate', {
       method: 'POST',
-      body: JSON.stringify({ purpose, fields }),
+      body: JSON.stringify({ purposes, fields }),
     }),
 
   reportErrors: (items: ReportItem[]) =>

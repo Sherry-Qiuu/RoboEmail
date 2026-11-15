@@ -69,15 +69,17 @@ const FACT_LABELS: [keyof GenerateFields, string][] = [
   ['signature', 'signature'],
 ]
 
-export function buildGenerateMessages(purpose: Purpose, fields: GenerateFields): ChatMessage[] {
+export function buildGenerateMessages(purposes: Purpose[], fields: GenerateFields): ChatMessage[] {
   const facts = FACT_LABELS.filter(([key]) => {
     const value = fields[key]
     return typeof value === 'string' && value.trim().length > 0
   }).map(([key, label]) => `- ${label}: ${String(fields[key]).trim()}`)
 
+  // One email often has to do two things at once, so several scenarios can be
+  // active together.
   const lines = [
-    `Scenario: ${purpose.label} (${purpose.id})`,
-    `What this email has to do: ${purpose.brief}`,
+    `Scenario: ${purposes.map((purpose) => `${purpose.label} (${purpose.id})`).join(' + ')}`,
+    `What this email has to do: ${purposes.map((purpose) => purpose.brief).join(' ')}`,
     `First contact: ${fields.firstContact ? 'yes' : 'no'}`,
     `Formality target (1-5): ${fields.formality ?? 3}`,
     '',
@@ -135,12 +137,12 @@ function mockGenerate(fields: GenerateFields): GenerateResult {
   }
 }
 
-export async function runGenerate(purposeId: string, fields: GenerateFields) {
-  const purpose = findPurpose(purposeId)
+export async function runGenerate(purposeIds: string[], fields: GenerateFields) {
+  const purposes = purposeIds.map(findPurpose)
   const started = Date.now()
 
   const raw = env.llm.apiKey
-    ? await completeJson(buildGenerateMessages(purpose, fields))
+    ? await completeJson(buildGenerateMessages(purposes, fields))
     : JSON.stringify(mockGenerate(fields))
 
   const result = ResultSchema.parse(extractJson(raw))

@@ -53,14 +53,17 @@ function composeBody(result: GenerateResult): string {
 }
 
 type Draft = {
-  purpose: string
+  purpose?: string
+  purposes?: string[]
   fields: GenerateFields
   salutation: string
 }
 
 export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
   const [restored] = useState(() => (seed ? null : readDraft<Draft>('write')))
-  const [purpose, setPurpose] = useState(restored?.purpose ?? 'inquiry')
+  const [purposes, setPurposes] = useState<string[]>(
+    restored?.purposes ?? (restored?.purpose ? [restored.purpose] : ['inquiry']),
+  )
   const [fields, setFields] = useState<GenerateFields>({
     ...EMPTY,
     recipientName: seed?.nameEn ?? '',
@@ -79,11 +82,20 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
 
   useEffect(() => {
     const timer = window.setTimeout(
-      () => writeDraft('write', { purpose, fields, salutation }),
+      () => writeDraft('write', { purposes, fields, salutation }),
       400,
     )
     return () => window.clearTimeout(timer)
-  }, [purpose, fields, salutation])
+  }, [purposes, fields, salutation])
+
+  /** Several purposes can be active at once; the last one cannot be removed. */
+  function togglePurpose(id: string) {
+    setPurposes((current) => {
+      if (!current.includes(id)) return [...current, id]
+      if (current.length === 1) return current
+      return current.filter((item) => item !== id)
+    })
+  }
 
   function onNameInput(value: string) {
     set('recipientName')(value)
@@ -118,7 +130,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
     setError('')
     setCopied('')
     try {
-      const response = await api.generate(purpose, { ...fields, salutation })
+      const response = await api.generate(purposes, { ...fields, salutation })
       setData(response)
       setSubjectIndex(0)
       setSlotValues({})
@@ -160,20 +172,25 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
     <section>
       <h1 className="font-display text-[32px] leading-none tracking-tight">写邮件</h1>
 
-      <div className="mt-8 flex flex-wrap gap-2">
-        {PURPOSES.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setPurpose(item.id)}
-            className={`border px-3 py-1.5 text-[13px] transition-colors ${
-              purpose === item.id
-                ? 'border-ink bg-ink text-paper'
-                : 'border-rule text-muted hover:border-ink hover:text-ink'
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
+      <div className="mt-8 flex flex-wrap items-center gap-2">
+        {PURPOSES.map((item) => {
+          const active = purposes.includes(item.id)
+          return (
+            <button
+              key={item.id}
+              onClick={() => togglePurpose(item.id)}
+              aria-pressed={active}
+              className={`border px-3 py-1.5 text-[13px] transition-colors ${
+                active
+                  ? 'border-accent bg-accent-soft text-ink'
+                  : 'border-rule text-muted hover:border-ink hover:text-ink'
+              }`}
+            >
+              {item.label}
+            </button>
+          )
+        })}
+        <span className="ml-1 text-[12px] text-faint">可多选</span>
       </div>
 
       <div className="mt-9 space-y-5">
@@ -251,6 +268,9 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
               onText={(said) => set('background')(`${fields.background ?? ''}${said}`)}
             />
           </div>
+          <p className="mt-1 text-[12px] text-faint">
+            用中文写就行。交代来龙去脉：这件事怎么来的、涉及谁、已经有哪些时间点。
+          </p>
           <textarea
             value={fields.background}
             onChange={(event) => set('background')(event.target.value)}

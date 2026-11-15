@@ -131,7 +131,9 @@ const PolishBody = z.object({
 })
 
 const GenerateBody = z.object({
-  purpose: z.string().max(30),
+  // `purpose` is the old single-value field; `purposes` allows several at once.
+  purpose: z.string().max(30).optional(),
+  purposes: z.array(z.string().max(30)).max(6).optional(),
   fields: z
     .object({
       recipientRole: z.string().max(30).optional(),
@@ -430,12 +432,20 @@ app.post('/api/generate', optionalAuth, async (c) => {
     return fail(c, 400, 'invalid_input', '至少写一点背景，或者你希望对方做什么')
   }
 
+  const purposes = (body.purposes?.length ? body.purposes : body.purpose ? [body.purpose] : []).slice(
+    0,
+    6,
+  )
+  if (purposes.length === 0) {
+    return fail(c, 400, 'invalid_input', '选一个写邮件的目的')
+  }
+
   const user = c.get('user')
   const denied = charge(c, user)
   if (denied) return denied
 
   try {
-    const out = await runGenerate(body.purpose, fields)
+    const out = await runGenerate(purposes, fields)
     return c.json({ ...out, trial: !user })
   } catch (error) {
     console.error('[generate]', error)

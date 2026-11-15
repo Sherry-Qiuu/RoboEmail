@@ -225,13 +225,14 @@ try {
   const generated = await call('/api/generate', {
     method: 'POST',
     body: {
-      purpose: 'inquiry',
+      purposes: ['inquiry', 'meeting'],
       fields: { background: 'deadline unclear', ask: 'confirm the date' },
     },
   })
   check(
     'generate returns paragraphs',
     generated.status === 200 && generated.payload.result.paragraphs.length > 0,
+    `purposes=2 paragraphs=${generated.payload.result?.paragraphs?.length ?? 0}`,
   )
 
   const reported = await call('/api/errors/batch', {
