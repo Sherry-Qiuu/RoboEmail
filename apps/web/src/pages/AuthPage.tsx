@@ -22,6 +22,8 @@ export function AuthPage({ onAuthed }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
+  const USERNAME_RE = /^[\p{L}\p{N}_-]{2,20}$/u
+
   async function submitForm(event: FormEvent) {
     event.preventDefault()
     setBusy(true)
@@ -31,6 +33,10 @@ export function AuthPage({ onAuthed }: Props) {
         const { user } = await api.login(username.trim(), password)
         onAuthed(user)
       } else {
+        if (!USERNAME_RE.test(username.trim())) {
+          setError('用户名用 2–20 位中文、字母、数字、下划线或短横线')
+          return
+        }
         const res = await api.register(username.trim(), email.trim(), password, isUnnc)
         setDevCode(res.devCode ?? '')
         setDelivered(res.delivered !== false)
@@ -216,6 +222,7 @@ export function AuthPage({ onAuthed }: Props) {
             className="field mt-1"
             autoComplete="username"
             autoFocus
+            maxLength={20}
           />
         </div>
 

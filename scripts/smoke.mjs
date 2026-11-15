@@ -291,6 +291,39 @@ try {
     body: { username: 'smoke', password: 'newsmokepass456' },
   })
   check('new password works', newLogin.status === 200)
+
+  // Usernames may be Chinese, and must stay unique regardless of case.
+  const chinese = await call('/api/auth/register', {
+    method: 'POST',
+    body: { username: '张同学', email: 'zhang@example.com', password: 'zhangpass123', isUnnc: true },
+  })
+  check('chinese username accepted', chinese.status === 200, `status=${chinese.status}`)
+
+  const duplicate = await call('/api/auth/register', {
+    method: 'POST',
+    body: { username: '张同学', email: 'dup@example.com', password: 'duppass12345', isUnnc: false },
+  })
+  check(
+    'duplicate username rejected',
+    duplicate.status === 409 && duplicate.payload.error === 'username_taken',
+    `status=${duplicate.status}`,
+  )
+
+  const cased = await call('/api/auth/register', {
+    method: 'POST',
+    body: { username: 'SMOKE', email: 'case@example.com', password: 'casepass1234', isUnnc: false },
+  })
+  check(
+    'username unique regardless of case',
+    cased.status === 409 && cased.payload.error === 'username_taken',
+    `status=${cased.status}`,
+  )
+
+  const tooShort = await call('/api/auth/register', {
+    method: 'POST',
+    body: { username: 'a', email: 'short@example.com', password: 'shortpass123', isUnnc: false },
+  })
+  check('short username rejected', tooShort.status === 400, `status=${tooShort.status}`)
 } catch (error) {
   console.error('smoke run threw:', error)
   failed += 1

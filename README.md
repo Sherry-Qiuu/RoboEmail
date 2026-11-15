@@ -13,7 +13,7 @@
   <img alt="react" src="https://img.shields.io/badge/react-19-61dafb?logo=react&logoColor=black" />
   <img alt="hono" src="https://img.shields.io/badge/hono-4-e36002" />
   <img alt="sqlite" src="https://img.shields.io/badge/sqlite-node:sqlite-003b57?logo=sqlite&logoColor=white" />
-  <img alt="smoke" src="https://img.shields.io/badge/smoke-23%20checks-4f7a5b" />
+  <img alt="smoke" src="https://img.shields.io/badge/smoke-27%20checks-4f7a5b" />
 </p>
 
 ---
@@ -166,7 +166,7 @@ python scripts/import_profiles.py      # 三院教师主页/ -> apps/server/asse
 | `pnpm dev` | 前后端一起起 |
 | `pnpm build` | 构建前端到 `apps/web/dist` |
 | `pnpm check` | 前端所有模块的语法检查 |
-| `pnpm smoke` | 端到端回归，临时数据库，23 项检查 |
+| `pnpm smoke` | 端到端回归，临时数据库，27 项检查 |
 | `pnpm test:export` | 导出格式的离线检查 |
 | `pnpm verify:live` | 从本机检查线上：端口、证书、接口、备案号 |
 

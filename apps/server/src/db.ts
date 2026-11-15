@@ -95,6 +95,11 @@ CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash);
 CREATE INDEX IF NOT EXISTS idx_codes_email ON email_codes(email, purpose, created_at);
 `)
 
+// The column is UNIQUE, but SQLite compares it case-sensitively. Logging in is
+// case-insensitive, so the uniqueness rule must be too, otherwise "Alice" and
+// "alice" could both exist and only one of them could ever log in.
+db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_nocase ON users(username COLLATE NOCASE)')
+
 export type UserRow = {
   id: string
   username: string

@@ -84,11 +84,15 @@ function issueCode(email: string, purpose: string): string {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// \p{L} covers Chinese, so 张伟 and Alice are both fine. Digits, underscore and
+// hyphen stay allowed because students often use student ids.
+const USERNAME_RE = /^[\p{L}\p{N}_-]{2,20}$/u
 
 const RegisterBody = z.object({
   username: z
     .string()
-    .regex(/^[A-Za-z0-9_]{3,20}$/, '用户名用 3–20 位字母、数字或下划线'),
+    .trim()
+    .regex(USERNAME_RE, '用户名用 2–20 位中文、字母、数字、下划线或短横线'),
   email: z.string().regex(EMAIL_RE, '邮箱格式不对'),
   password: z.string().min(8, '密码至少 8 位').max(128),
   isUnnc: z.boolean().optional().default(false),
@@ -199,9 +203,18 @@ app.post('/api/auth/register', async (c) => {
     )
   } else {
     if (findUserByUsername(username)) return fail(c, 409, 'username_taken', '这个用户名已经被用了')
-    db.prepare(
-      'INSERT INTO users (id, username, email, password_hash, email_verified_at, is_unnc, quota_day, quota_used, created_at, updated_at) VALUES (?, ?, ?, ?, NULL, ?, ?, 0, ?, ?)',
-    ).run(newId(), username, normalized, passwordHash, isUnnc ? 1 : 0, '', now, now)
+    try {
+      db.prepare(
+        'INSERT INTO users (id, username, email, password_hash, email_verified_at, is_unnc, quota_day, quota_used, created_at, updated_at) VALUES (?, ?, ?, ?, NULL, ?, ?, 0, ?, ?)',
+      ).run(newId(), username, normalized, passwordHash, isUnnc ? 1 : 0, '', now, now)
+    } catch (error) {
+      // Two requests can pass the check above at the same time; the index is
+      // what actually decides, so turn its refusal into the same answer.
+      if (String((error as Error).message).includes('UNIQUE')) {
+        return fail(c, 409, 'username_taken', '这个用户名已经被用了')
+      }
+      throw error
+    }
   }
 
   const code = issueCode(normalized, 'verify')
