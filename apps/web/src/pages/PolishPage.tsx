@@ -52,9 +52,6 @@ function DirectionPicker({ tags, onToggle, direction, setDirection, disabled }: 
         <span className="label">想改的方向（可多选）</span>
         <VoiceButton onText={(said) => setDirection(`${direction}${said}`)} />
       </div>
-      <p className="mt-1 text-[12px] text-faint">
-        选标签，或者直接写：别太卑微、强调截止日期、保留原来的客气。
-      </p>
 
       <div className="mt-2 flex flex-wrap gap-2">
         {QUICK.map((item) => {
