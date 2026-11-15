@@ -24,6 +24,9 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
   const [text, setText] = useState(
     () => preset || readDraft<{ text: string }>('polish')?.text || '',
   )
+  const [direction, setDirection] = useState(
+    () => readDraft<{ text: string; direction?: string }>('polish')?.direction ?? '',
+  )
   const [recipient, setRecipient] = useState('教授')
   const [formality, setFormality] = useState(3)
   const [loading, setLoading] = useState(false)
@@ -46,9 +49,9 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
   }
 
   useEffect(() => {
-    const timer = window.setTimeout(() => writeDraft('polish', { text }), 400)
+    const timer = window.setTimeout(() => writeDraft('polish', { text, direction }), 400)
     return () => window.clearTimeout(timer)
-  }, [text])
+  }, [text, direction])
 
   async function run() {
     setLoading(true)
@@ -56,7 +59,11 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
     setCopied(false)
     setRound(0)
     try {
-      const response = await api.polish(text, { recipient, formality })
+      const response = await api.polish(text, {
+        recipient,
+        formality,
+        instruction: direction.trim() || undefined,
+      })
       setData(response)
       remember(response.trial, {
         mode: 'polish',
@@ -129,6 +136,22 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
           className="field mt-1 min-h-[220px] resize-y text-[15px] leading-[1.8]"
           spellCheck={false}
         />
+
+        <div className="mt-6">
+          <div className="flex items-baseline justify-between">
+            <span className="label">想改的方向（可选）</span>
+            <VoiceButton onText={(said) => setDirection((current) => `${current}${said}`)} />
+          </div>
+          <p className="mt-1 text-[12px] text-faint">
+            告诉它这封信哪里不对：更简洁、更客气、别太卑微、强调截止日期。
+          </p>
+          <input
+            value={direction}
+            onChange={(event) => setDirection(event.target.value)}
+            maxLength={200}
+            className="field mt-1"
+          />
+        </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-5">
