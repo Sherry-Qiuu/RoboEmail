@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { exportHtml, exportJson, exportPdf, exportWord } from '../export'
 import { history, summaryLine, type HistoryEntry } from '../store'
 
 /**
@@ -35,7 +36,38 @@ export function MyPage() {
   const [items, setItems] = useState<HistoryEntry[]>([])
   const [ready, setReady] = useState(false)
   const [copied, setCopied] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [notice, setNotice] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
+  const menu = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function onDown(event: MouseEvent) {
+      if (!menu.current?.contains(event.target as Node)) setMenuOpen(false)
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
+
+  function pick(format: 'word' | 'pdf' | 'html' | 'json') {
+    setMenuOpen(false)
+    setNotice('')
+    if (items.length === 0) return
+    if (format === 'word') exportWord(items)
+    if (format === 'html') exportHtml(items)
+    if (format === 'json') exportJson(items)
+    if (format === 'pdf' && !exportPdf(items)) {
+      setNotice('浏览器拦住了新窗口，允许后重试，或用 Word 导出再另存为 PDF。')
+    }
+  }
 
   async function refresh() {
     setItems(await history.list())
@@ -83,9 +115,42 @@ export function MyPage() {
       <h1 className="font-display text-[32px] leading-none tracking-tight">历史记录</h1>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <button className="btn btn-ghost" onClick={() => download(items)} disabled={items.length === 0}>
-          导出
-        </button>
+        <div className="relative" ref={menu}>
+          <button
+            className="btn btn-ghost"
+            onClick={() => setMenuOpen((open) => !open)}
+            disabled={items.length === 0}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+          >
+            导出
+            <span className="text-faint">▾</span>
+          </button>
+
+          {menuOpen && (
+            <div
+              role="menu"
+              className="panel absolute left-0 top-[calc(100%+6px)] z-20 w-[200px] overflow-hidden py-1"
+            >
+              {[
+                ['word', 'Word 文档', '每封信另起一页'],
+                ['pdf', 'PDF', '打印后另存为 PDF'],
+                ['html', '网页', '左侧带目录'],
+                ['json', '备份文件', '可重新导入'],
+              ].map(([value, label, hint]) => (
+                <button
+                  key={value}
+                  role="menuitem"
+                  onClick={() => pick(value as 'word' | 'pdf' | 'html' | 'json')}
+                  className="block w-full px-4 py-2 text-left transition-colors hover:bg-[var(--edge-hover,#f0f0ec)]"
+                >
+                  <span className="block text-[13px]">{label}</span>
+                  <span className="block text-[11px] text-faint">{hint}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button className="btn btn-ghost" onClick={() => fileInput.current?.click()}>
           导入
         </button>
@@ -100,6 +165,8 @@ export function MyPage() {
           className="hidden"
         />
       </div>
+
+      {notice && <p className="mt-6 text-[12px] text-warn">{notice}</p>}
 
       {ready && items.length === 0 && (
         <p className="mt-12 border-t border-rule pt-6 text-[13px] text-faint">
