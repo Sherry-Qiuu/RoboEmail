@@ -23,7 +23,7 @@ export const env = {
   dbPath: resolve(appRoot, process.env.DB_PATH ?? 'data/roboemail.db'),
   quota: {
     userPerDay: Number(process.env.QUOTA_USER_PER_DAY ?? 30),
-    trialPerDay: Number(process.env.QUOTA_TRIAL_PER_DAY ?? 3),
+    trialPerDay: Number(process.env.QUOTA_TRIAL_PER_DAY ?? 1),
   },
   llm: {
     baseUrl: (process.env.LLM_BASE_URL ?? 'https://api.deepseek.com/v1').replace(/\/$/, ''),

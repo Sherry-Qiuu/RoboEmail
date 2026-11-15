@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   api,
+  isTrialUsed,
   type GenerateFields,
   type GenerateResponse,
   type GenerateResult,
@@ -129,6 +130,12 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
         payload: response,
       })
     } catch (cause) {
+      // Trial is one run only, so the next attempt opens sign-up directly.
+      if (isTrialUsed(cause)) {
+        setError('')
+        onNeedAccount()
+        return
+      }
       setError(cause instanceof Error ? cause.message : '出错了')
     } finally {
       setLoading(false)

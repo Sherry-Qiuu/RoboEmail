@@ -105,7 +105,7 @@ RoboEmail/
 | 教授库 | ✅ 可用 | `professors.ts`、`routes/people.ts` | 仅 UNNC 身份可见 |
 | 学习页（错题本 + 统计） | ✅ 可用 | `routes/learn.ts`、`LearnPage.tsx` | 需要登录 |
 | 我的（配额、导出） | ✅ 可用 | `MyPage.tsx`、`/api/auth/me` | |
-| 未登录试用 | ✅ 可用 | `index.ts` 的 `charge()` | 每 IP 每天 3 次，不写库 |
+| 未登录试用 | ✅ 可用 | `index.ts` 的 `charge()` | 每 IP 每天 1 次，不写库 |
 | 语音输入 | ✅ 可用 | `VoiceButton.tsx` | 浏览器 Web Speech API |
 | 真实发信 | ✅ 可用 | `mailer/smtp.ts` | 见第 6 节 |
 | 忘记密码 | ✅ 可用 | `index.ts`、`ResetPage.tsx` | `/api/auth/forgot` + `/api/auth/reset` + `/reset?token=` 页面 |

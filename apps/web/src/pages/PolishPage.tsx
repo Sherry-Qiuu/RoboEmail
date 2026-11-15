@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, categoryLabel, type PolishResponse } from '../api'
+import { api, categoryLabel, isTrialUsed, type PolishResponse } from '../api'
 import { DiffText } from '../components/DiffText'
 import { TrialNote } from '../components/TrialNote'
 import { VoiceButton } from '../components/VoiceButton'
@@ -33,6 +33,17 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
   const [copied, setCopied] = useState(false)
   const [round, setRound] = useState(0)
   const [instruction, setInstruction] = useState('')
+
+  /** The free trial is a single run, so the second attempt goes straight to
+   *  sign-up instead of leaving the user staring at an error line. */
+  function fail(cause: unknown): void {
+    if (isTrialUsed(cause)) {
+      setError('')
+      onNeedAccount()
+      return
+    }
+    setError(cause instanceof Error ? cause.message : '出错了')
+  }
 
   useEffect(() => {
     const timer = window.setTimeout(() => writeDraft('polish', { text }), 400)
@@ -69,7 +80,7 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
           .catch(() => undefined)
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '出错了')
+      fail(cause)
     } finally {
       setLoading(false)
     }
@@ -89,7 +100,7 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
       setRound((current) => current + 1)
       setInstruction('')
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '出错了')
+      fail(cause)
     } finally {
       setLoading(false)
     }

@@ -128,6 +128,23 @@ export type Insights = {
   items: LearnItem[]
 }
 
+/** Carries the server's error code so callers can react to specific refusals. */
+export class ApiError extends Error {
+  status: number
+  code: string
+
+  constructor(message: string, status: number, code: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.code = code
+  }
+}
+
+export function isTrialUsed(cause: unknown): boolean {
+  return cause instanceof ApiError && cause.code === 'trial_exceeded'
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(path, {
     credentials: 'include',
@@ -139,7 +156,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   })
   const data = (await res.json().catch(() => ({}))) as Record<string, unknown>
   if (!res.ok) {
-    throw new Error((data.detail as string) || (data.error as string) || '请求失败')
+    const message = (data.detail as string) || (data.error as string) || '请求失败'
+    throw new ApiError(message, res.status, (data.error as string) ?? '')
   }
   return data as T
 }
