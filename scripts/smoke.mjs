@@ -16,7 +16,8 @@ import { createHash, randomUUID } from 'node:crypto'
 
 const root = resolve(import.meta.dirname, '..')
 const port = process.env.SMOKE_PORT ?? '8899'
-const dbName = 'smoke.db'
+// Unique per run: a file left behind by a killed run must not block the next one.
+const dbName = `smoke-${process.pid}.db`
 const dbPath = join(root, 'apps/server/data', dbName)
 const base = `http://127.0.0.1:${port}`
 
@@ -28,7 +29,11 @@ function check(name, ok, detail = '') {
 
 function resetDatabase() {
   for (const suffix of ['', '-wal', '-shm']) {
-    rmSync(dbPath + suffix, { force: true })
+    try {
+      rmSync(dbPath + suffix, { force: true })
+    } catch {
+      // A stale file that a dead process still holds is harmless.
+    }
   }
 }
 
@@ -49,38 +54,25 @@ async function waitForServer() {
   return false
 }
 
-/** The throwaway database starts empty; the directory needs rows to be useful. */
-function seedProfessors() {
-  const rows = JSON.parse(
-    readFileSync(join(root, 'apps/server/data/professors.json'), 'utf8'),
-  )
-  const db = new DatabaseSync(dbPath)
-  const insert = db.prepare(
-    `INSERT INTO professors
-       (id, name_en, surname, name_zh, name_pinyin, title, salutation_override,
-        school, department, email, role, modules, profile_url, source_url, updated_at)
-     VALUES (?, ?, ?, NULL, NULL, ?, NULL, ?, ?, ?, ?, NULL, ?, ?, ?)`,
-  )
-  const now = new Date().toISOString()
-  for (const row of rows) {
-    insert.run(
-      randomUUID(),
-      row.nameEn,
-      row.surname,
-      row.titleCn,
-      row.school,
-      row.department || null,
-      row.email ?? null,
-      row.titleEn || null,
-      row.profileUrl ?? null,
-      row.sourceUrl ?? null,
-      now,
-    )
+/** The server seeds the directory itself on boot, so just wait for the rows. */
+async function waitForDirectory() {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const health = await call('/api/health')
+    if (health.status === 200) {
+      const probe = new DatabaseSync(dbPath, { readOnly: true })
+      try {
+        const row = probe.prepare('SELECT COUNT(*) AS n FROM professors').get()
+        if (row.n > 0) return row.n
+      } catch {
+        // table not created yet
+      } finally {
+        probe.close()
+      }
+    }
+    await sleep(250)
   }
-  db.close()
-  return rows.length
+  return 0
 }
-
 let cookie = ''
 
 async function call(path, { method = 'GET', body } = {}) {
@@ -131,7 +123,7 @@ try {
   const health = await call('/api/health')
   check('health', health.status === 200 && health.payload.provider === 'mock')
 
-  const seeded = seedProfessors()
+  const seeded = await waitForDirectory()
   check('professor seed', seeded > 0, `${seeded} rows`)
 
   const email = 'smoke@example.com'
@@ -171,6 +163,26 @@ try {
     'professor search',
     people.status === 200 && people.payload.total > 0 && people.payload.items.length > 0,
     `total=${people.payload.total} hits=${people.payload.items.length}`,
+  )
+
+  // The rich profile is joined from the shipped bundle, not the database, so
+  // check the join actually produces research and papers for a real person.
+  let profileWithPapers = null
+  for (const item of people.payload.items.slice(0, 8)) {
+    const detail = await call(`/api/professors/${item.id}/profile`)
+    if (detail.payload.profile?.papers?.length) {
+      profileWithPapers = detail.payload.profile
+      break
+    }
+  }
+  check(
+    'professor profile has papers',
+    Boolean(profileWithPapers?.papers?.length),
+    profileWithPapers ? `${profileWithPapers.papers.length} papers` : 'none found',
+  )
+  check(
+    'profile paper links are usable',
+    Boolean(profileWithPapers?.papers?.every((paper) => paper.doi || paper.pure)),
   )
 
   const polished = await call('/api/polish', {

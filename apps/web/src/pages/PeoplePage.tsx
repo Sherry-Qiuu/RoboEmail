@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, type Professor } from '../api'
+import { ProfessorModal } from '../components/ProfessorModal'
 
 type Props = {
   signedIn: boolean
@@ -49,6 +50,7 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
   const [query, setQuery] = useState('')
   const [school, setSchool] = useState('')
   const [department, setDepartment] = useState('')
+  const [active, setActive] = useState<Professor | null>(null)
 
   useEffect(() => {
     if (!signedIn || !isUnnc) {
@@ -195,6 +197,7 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
       <p className="mt-6 text-[12px] text-faint">
         {filtered.length} 条
         {filtered.length > shown.length && `，显示前 ${shown.length} 条`}
+        {filtered.length > 0 && ' · 点姓名看档案'}
       </p>
 
       <ul className="mt-2">
@@ -203,8 +206,12 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
             key={item.id}
             className="flex items-baseline justify-between gap-4 border-t border-rule py-3"
           >
-            <div className="min-w-0">
-              <p className="text-[14px]">
+            <button
+              onClick={() => setActive(item)}
+              aria-label={`查看 ${item.nameEn} 的档案`}
+              className="group min-w-0 flex-1 text-left"
+            >
+              <p className="text-[14px] group-hover:underline">
                 {item.nameEn}
                 <span className="ml-2 text-[12px] text-faint">{item.title}</span>
               </p>
@@ -213,7 +220,7 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
                 {item.department}
                 {item.email && ` · ${item.email}`}
               </p>
-            </div>
+            </button>
             <button
               onClick={() => onWriteTo(item)}
               className="shrink-0 text-[12px] text-muted transition-colors hover:text-ink"
@@ -226,6 +233,17 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
 
       {filtered.length === 0 && (
         <p className="border-t border-rule pt-6 text-[13px] text-faint">没有匹配的人。</p>
+      )}
+
+      {active && (
+        <ProfessorModal
+          professor={active}
+          onClose={() => setActive(null)}
+          onWriteTo={(professor) => {
+            setActive(null)
+            onWriteTo(professor)
+          }}
+        />
       )}
     </section>
   )

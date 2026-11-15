@@ -88,6 +88,30 @@ export type Professor = {
   updatedAt: string
 }
 
+export type ProfessorPaper = {
+  title: string
+  doi: string
+  pure: string
+  year: string
+  venue: string
+  type: string
+}
+
+export type ProfessorProfile = {
+  name: string
+  faculty: string
+  titleEn: string
+  titleCn: string
+  dept: string
+  deptCn: string
+  email: string
+  research: string
+  photoUrl: string
+  profileUrl: string
+  pureUrl: string
+  papers: ProfessorPaper[]
+}
+
 export type ReportItem = {
   category: string
   before: string
@@ -190,6 +214,11 @@ export const api = {
   professors: (q: string) =>
     request<{ items: Professor[]; total: number }>(
       `/api/professors?q=${encodeURIComponent(q)}`,
+    ),
+
+  professorProfile: (id: string) =>
+    request<{ profile: ProfessorProfile | null }>(
+      `/api/professors/${encodeURIComponent(id)}/profile`,
     ),
 
   setUnnc: (isUnnc: boolean) =>

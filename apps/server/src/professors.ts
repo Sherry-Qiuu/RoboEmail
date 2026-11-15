@@ -94,6 +94,10 @@ export function listProfessors(limit = 1000): ProfessorRow[] {
     .all(limit) as ProfessorRow[]
 }
 
+export function findProfessorById(id: string): ProfessorRow | undefined {
+  return db.prepare('SELECT * FROM professors WHERE id = ?').get(id) as ProfessorRow | undefined
+}
+
 export function countProfessors(): number {
   const row = db.prepare('SELECT COUNT(*) AS n FROM professors').get() as { n: number }
   return row.n

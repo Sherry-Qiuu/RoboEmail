@@ -9,6 +9,20 @@ release/
 /data/
 /data_business/
 /data_fhss/
+
+# scraped staff-portal bundles behind the profile cards; the built output in
+# apps/server/assets/ is what the app actually reads
+/三院教师主页/
+/三院教师主页.zip
+/理工学院教授主页/
+/理工学院教授主页.zip
+/人文社科学院教师照片/
+/商学院教师照片/
+/理工学院教师照片/
+/*教师照片册.*
+/data_photos*/
+/site_data/
+/dsh-session-*.zip
 *.db
 *.db-shm
 *.db-wal

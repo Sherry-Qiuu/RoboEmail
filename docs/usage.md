@@ -264,6 +264,20 @@ node scripts/import_professors.mjs
 
 称呼由 `apps/server/src/professors.ts` 按职称推导：教授 → Professor，副教授/助理教授/研究员/导师 → Dr，行政与技术岗用全名。
 
+### 8.1 档案数据（弹窗用）
+
+教授列表点姓名会打开档案卡（照片、研究方向、近期论文、学校档案页）。
+
+```powershell
+# 三院教师主页/ -> apps/server/assets/
+python scripts/import_profiles.py
+```
+
+- 输入：`三院教师主页/data.json` 与 `三院教师主页/photos/`（抓取产物，未纳入仓库）
+- 输出：`apps/server/assets/profiles.json`、`apps/server/assets/photos/`（长边压到 420px，约 7 MB）
+- 匹配规则：先按邮箱、再按姓名（忽略 Dr/Prof 前缀）把档案对到数据库里的教授行。463 份档案覆盖 447 行，其余行弹窗只显示基础信息
+- 需要 Pillow：`pip install pillow`；照片已存在且比源文件新时不会重复压缩
+
 ---
 
 ## 9. 常见问题
