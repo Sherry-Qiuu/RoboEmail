@@ -9,15 +9,83 @@ import { summaryLine, remember } from '../store'
 const RECIPIENTS = ['教授', '导师', '教务行政', '同学', '其他']
 
 const QUICK = [
-  { label: '更正式', instruction: 'Make it more formal and more polite for an academic recipient.' },
-  { label: '更简洁', instruction: 'Make it shorter. Cut every sentence that carries no information.' },
-  { label: '更礼貌', instruction: 'Soften the tone and give the recipient an easier way to decline.' },
-  { label: '更具体', instruction: 'Make the request more concrete and specific.' },
+  {
+    id: 'formal',
+    label: '更正式',
+    instruction: 'Make it more formal and more polite for an academic recipient.',
+  },
+  {
+    id: 'short',
+    label: '更简洁',
+    instruction: 'Make it shorter. Cut every sentence that carries no information.',
+  },
+  {
+    id: 'polite',
+    label: '更礼貌',
+    instruction: 'Soften the tone and give the recipient an easier way to decline.',
+  },
+  {
+    id: 'concrete',
+    label: '更具体',
+    instruction: 'Make the request more concrete and specific.',
+  },
 ]
 
 type Props = {
   onNeedAccount: () => void
   preset?: string
+}
+
+type PickerProps = {
+  tags: string[]
+  onToggle: (id: string) => void
+  direction: string
+  setDirection: (value: string) => void
+  disabled?: boolean
+}
+
+/** Chips plus free text. The same picker drives the first run and every rerun. */
+function DirectionPicker({ tags, onToggle, direction, setDirection, disabled }: PickerProps) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between">
+        <span className="label">想改的方向（可多选）</span>
+        <VoiceButton onText={(said) => setDirection(`${direction}${said}`)} />
+      </div>
+      <p className="mt-1 text-[12px] text-faint">
+        选标签，或者直接写：别太卑微、强调截止日期、保留原来的客气。
+      </p>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        {QUICK.map((item) => {
+          const active = tags.includes(item.id)
+          return (
+            <button
+              key={item.id}
+              onClick={() => onToggle(item.id)}
+              aria-pressed={active}
+              disabled={disabled}
+              className={`border px-3 py-1 text-[12px] transition-colors disabled:opacity-40 ${
+                active
+                  ? 'border-accent bg-accent-soft text-ink'
+                  : 'border-rule text-muted hover:border-ink hover:text-ink'
+              }`}
+            >
+              {item.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <input
+        value={direction}
+        onChange={(event) => setDirection(event.target.value)}
+        maxLength={200}
+        disabled={disabled}
+        className="field mt-2"
+      />
+    </div>
+  )
 }
 
 export function PolishPage({ onNeedAccount, preset = '' }: Props) {
@@ -35,7 +103,24 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
   const [showRemoved, setShowRemoved] = useState(false)
   const [copied, setCopied] = useState(false)
   const [round, setRound] = useState(0)
-  const [instruction, setInstruction] = useState('')
+  const [tags, setTags] = useState<string[]>(
+    () => readDraft<{ text: string; tags?: string[] }>('polish')?.tags ?? [],
+  )
+
+  /** Chips and free text are combined into the one instruction the model sees,
+   *  and the same selection applies to the first run and to every rerun. */
+  function buildInstruction(): string | undefined {
+    const parts = QUICK.filter((item) => tags.includes(item.id)).map((item) => item.instruction)
+    const free = direction.trim()
+    if (free) parts.push(free)
+    return parts.length > 0 ? parts.join(' ') : undefined
+  }
+
+  function toggleTag(id: string) {
+    setTags((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    )
+  }
 
   /** The free trial is a single run, so the second attempt goes straight to
    *  sign-up instead of leaving the user staring at an error line. */
@@ -49,9 +134,9 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
   }
 
   useEffect(() => {
-    const timer = window.setTimeout(() => writeDraft('polish', { text, direction }), 400)
+    const timer = window.setTimeout(() => writeDraft('polish', { text, direction, tags }), 400)
     return () => window.clearTimeout(timer)
-  }, [text, direction])
+  }, [text, direction, tags])
 
   async function run() {
     setLoading(true)
@@ -62,7 +147,7 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
       const response = await api.polish(text, {
         recipient,
         formality,
-        instruction: direction.trim() || undefined,
+        instruction: buildInstruction(),
       })
       setData(response)
       remember(response.trial, {
@@ -93,7 +178,8 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
     }
   }
 
-  async function iterate(note: string) {
+  /** Rerun on the current revision, with the same chips and free text. */
+  async function rerun() {
     if (!data) return
     setLoading(true)
     setError('')
@@ -101,11 +187,10 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
       const response = await api.polish(data.result.revised, {
         recipient,
         formality,
-        instruction: note,
+        instruction: buildInstruction(),
       })
       setData(response)
       setRound((current) => current + 1)
-      setInstruction('')
     } catch (cause) {
       fail(cause)
     } finally {
@@ -138,18 +223,12 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
         />
 
         <div className="mt-6">
-          <div className="flex items-baseline justify-between">
-            <span className="label">想改的方向（可选）</span>
-            <VoiceButton onText={(said) => setDirection((current) => `${current}${said}`)} />
-          </div>
-          <p className="mt-1 text-[12px] text-faint">
-            告诉它这封信哪里不对：更简洁、更客气、别太卑微、强调截止日期。
-          </p>
-          <input
-            value={direction}
-            onChange={(event) => setDirection(event.target.value)}
-            maxLength={200}
-            className="field mt-1"
+          <DirectionPicker
+            tags={tags}
+            onToggle={toggleTag}
+            direction={direction}
+            setDirection={setDirection}
+            disabled={loading}
           />
         </div>
 
@@ -248,36 +327,19 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
               {round > 0 && <span className="text-[12px] text-faint">第 {round + 1} 版</span>}
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {QUICK.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => iterate(item.instruction)}
-                  disabled={loading}
-                  className="border border-rule px-3 py-1 text-[12px] text-muted transition-colors hover:border-ink hover:text-ink disabled:opacity-40"
-                >
-                  {item.label}
-                </button>
-              ))}
+            <div className="mt-3">
+              <DirectionPicker
+                tags={tags}
+                onToggle={toggleTag}
+                direction={direction}
+                setDirection={setDirection}
+                disabled={loading}
+              />
             </div>
 
-            <div className="mt-3 flex gap-2">
-              <input
-                value={instruction}
-                onChange={(event) => setInstruction(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && instruction.trim() && !loading) {
-                    void iterate(instruction.trim())
-                  }
-                }}
-                className="field"
-              />
-              <button
-                className="btn btn-ghost shrink-0"
-                onClick={() => void iterate(instruction.trim())}
-                disabled={loading || !instruction.trim()}
-              >
-                改
+            <div className="mt-4 flex justify-end">
+              <button className="btn btn-ghost" onClick={() => void rerun()} disabled={loading}>
+                {loading ? '正在改…' : '再润色一次'}
               </button>
             </div>
           </div>
