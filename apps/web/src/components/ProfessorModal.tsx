@@ -74,7 +74,8 @@ export function ProfessorModal({ professor, onClose, onWriteTo }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/35 px-4 py-10"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-10"
+      style={{ background: 'var(--edge-backdrop, rgba(20, 20, 18, 0.35))' }}
       onClick={onClose}
       role="presentation"
     >
@@ -85,7 +86,7 @@ export function ProfessorModal({ professor, onClose, onWriteTo }: Props) {
         aria-modal="true"
         aria-labelledby="professor-modal-title"
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-[720px] border border-rule bg-paper shadow-[0_24px_70px_rgba(25,25,23,0.18)] outline-none"
+        className="panel-float w-full max-w-[720px] outline-none"
       >
         <div className="flex items-start justify-between gap-4 border-b border-rule px-8 py-5">
           <div>

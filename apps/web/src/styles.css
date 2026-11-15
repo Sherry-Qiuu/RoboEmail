@@ -1,20 +1,33 @@
 @import 'tailwindcss';
 
+/*
+ * Colour comes from the Edge Fluent appearance runtime (public/edge-theme.js),
+ * which writes --edge-* on <html> for light/dark and the five colour themes.
+ * Every token keeps a literal fallback so the page still renders if that script
+ * is blocked or the CSP refuses it.
+ */
 @theme {
-  --color-paper: #faf9f6;
-  --color-surface: #ffffff;
-  --color-ink: #191917;
-  --color-muted: #6f6f68;
-  --color-faint: #9b9b93;
-  --color-rule: #e6e4dc;
-  --color-accent: #2f5b4c;
-  --color-accent-soft: #edf2ee;
+  --color-paper: var(--edge-bg, #f3f3f1);
+  --color-surface: var(--edge-surface, #ffffff);
+  --color-ink: var(--edge-text, #191917);
+  --color-muted: var(--edge-muted, #6f6f68);
+  --color-faint: var(--edge-faint, #9b9b93);
+  --color-rule: var(--edge-border, #e6e4dc);
+  --color-accent: var(--edge-accent, #4f7a5b);
+  --color-accent-soft: var(--edge-accent-soft, #edf2ee);
   --color-warn: #8a5a2b;
-  --color-warn-soft: #f7efe6;
+  --color-warn-soft: var(--edge-accent-soft-2, #f7efe6);
 
   --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Songti SC', Georgia, serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei',
-    sans-serif;
+  --font-sans: var(
+    --edge-font,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'PingFang SC',
+    'Microsoft YaHei',
+    sans-serif
+  );
 }
 
 @layer base {
@@ -23,21 +36,31 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* The runtime paints the canvas (background and, when chosen, the image art),
+     so the body only carries type metrics here. */
   body {
     margin: 0;
-    background: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.7;
+    /* Only used when the appearance runtime is absent; otherwise its unlayered
+       rules paint the canvas and the optional image art on top of this. */
+    background: var(--edge-bg, #f3f3f1);
+    color: var(--edge-text, #191917);
+    font-family: var(--edge-font, var(--font-sans));
+    font-size: 14px;
+    line-height: 1.6;
   }
 
   ::selection {
-    background: var(--color-accent-soft);
+    background: var(--edge-accent-soft, #edf2ee);
+    color: var(--edge-text, #191917);
   }
 
   button {
     font-family: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--edge-accent, #4f7a5b);
+    outline-offset: 2px;
   }
 }
 
@@ -47,16 +70,23 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border: 1px solid transparent;
-    border-radius: 2px;
-    padding: 0.5rem 1rem;
+    min-height: 36px;
+    border: 1px solid var(--edge-border-strong, #d0d0c8);
+    border-radius: var(--edge-r-md, 8px);
+    padding: 0 0.9rem;
+    background: var(--edge-surface, #ffffff);
+    color: var(--edge-text, #191917);
     font-size: 13px;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
     transition:
-      background 120ms ease,
-      border-color 120ms ease,
-      color 120ms ease;
+      background 120ms var(--edge-ease, ease),
+      border-color 120ms var(--edge-ease, ease),
+      color 120ms var(--edge-ease, ease);
     cursor: pointer;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--edge-hover, #f0f0ec);
   }
 
   .btn:disabled {
@@ -65,45 +95,73 @@
   }
 
   .btn-primary {
-    background: var(--color-ink);
-    color: var(--color-paper);
+    border-color: var(--edge-accent, #4f7a5b);
+    background: var(--edge-accent, #4f7a5b);
+    color: var(--edge-accent-ink, #ffffff);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: var(--color-accent);
+    border-color: var(--edge-accent-strong, #3f6549);
+    background: var(--edge-accent-strong, #3f6549);
   }
 
   .btn-ghost {
-    border-color: var(--color-rule);
-    color: var(--color-muted);
+    border-color: var(--edge-border, #e6e4dc);
     background: transparent;
+    color: var(--edge-text-2, #4a4a45);
   }
 
   .btn-ghost:hover:not(:disabled) {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
+    border-color: var(--edge-border-strong, #d0d0c8);
+    background: var(--edge-hover, #f0f0ec);
+    color: var(--edge-text, #191917);
   }
 
   .field {
     width: 100%;
-    border: 1px solid var(--color-rule);
-    border-radius: 2px;
-    background: var(--color-surface);
-    padding: 0.6rem 0.75rem;
+    min-height: 36px;
+    border: 1px solid var(--edge-border-strong, #d0d0c8);
+    border-radius: var(--edge-r-md, 8px);
+    background: var(--edge-surface, #ffffff);
+    padding: 0.45rem 0.7rem;
     font-size: 14px;
-    color: var(--color-ink);
+    color: var(--edge-text, #191917);
     outline: none;
-    transition: border-color 120ms ease;
+    transition:
+      border-color 120ms var(--edge-ease, ease),
+      box-shadow 120ms var(--edge-ease, ease);
+  }
+
+  .field::placeholder {
+    color: var(--edge-faint, #9b9b93);
   }
 
   .field:focus {
-    border-color: var(--color-ink);
+    border-color: var(--edge-accent, #4f7a5b);
+    box-shadow: 0 0 0 3px var(--edge-accent-soft, #edf2ee);
   }
 
   .label {
     font-size: 11px;
-    letter-spacing: 0.14em;
+    font-weight: 500;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-faint);
+    color: var(--edge-faint, #9b9b93);
+  }
+
+  /* One large surface, 1 px border, short shadow — the Edge separation rule. */
+  .panel {
+    border: 1px solid var(--edge-border, #e6e4dc);
+    border-radius: var(--edge-r-xl, 12px);
+    background: var(--edge-surface, #ffffff);
+    box-shadow: var(--edge-shadow-2, 0 6px 18px rgba(25, 25, 23, 0.07));
+  }
+
+  .panel-float {
+    border: 1px solid var(--edge-border, #e6e4dc);
+    border-radius: var(--edge-r-xl, 12px);
+    background: var(--edge-panel-bg, rgba(251, 251, 249, 0.92));
+    backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: var(--edge-shadow-3, 0 20px 50px rgba(25, 25, 23, 0.18));
   }
 }
