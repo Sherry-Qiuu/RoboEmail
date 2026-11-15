@@ -193,6 +193,31 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
         <span className="ml-1 text-[12px] text-faint">可多选</span>
       </div>
 
+      <div className="mt-5 flex flex-wrap items-center gap-6">
+        <label className="flex items-center gap-2 text-[13px]">
+          <input
+            type="checkbox"
+            checked={fields.firstContact}
+            onChange={(event) => set('firstContact')(event.target.checked)}
+            className="accent-accent"
+          />
+          初次联系
+        </label>
+
+        <label className="flex items-center gap-2">
+          <span className="label">正式度</span>
+          <input
+            type="range"
+            min={1}
+            max={5}
+            value={fields.formality}
+            onChange={(event) => set('formality')(Number(event.target.value))}
+            className="w-[88px] accent-accent"
+          />
+          <span className="w-3 text-[12px] text-muted">{fields.formality}</span>
+        </label>
+      </div>
+
       <div className="mt-9 space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
@@ -294,31 +319,6 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
           <summary className="cursor-pointer text-[13px] text-muted">补充</summary>
 
           <div className="mt-4 space-y-4">
-            <div className="flex flex-wrap items-center gap-6">
-              <label className="flex items-center gap-2 text-[13px]">
-                <input
-                  type="checkbox"
-                  checked={fields.firstContact}
-                  onChange={(event) => set('firstContact')(event.target.checked)}
-                  className="accent-accent"
-                />
-                初次联系
-              </label>
-
-              <label className="flex items-center gap-2">
-                <span className="label">正式度</span>
-                <input
-                  type="range"
-                  min={1}
-                  max={5}
-                  value={fields.formality}
-                  onChange={(event) => set('formality')(Number(event.target.value))}
-                  className="w-[88px] accent-accent"
-                />
-                <span className="w-3 text-[12px] text-muted">{fields.formality}</span>
-              </label>
-            </div>
-
             <label className="block">
               <div className="flex items-baseline justify-between">
                 <span className="label">原因</span>
