@@ -130,7 +130,15 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
     setError('')
     setCopied('')
     try {
-      const response = await api.generate(purposes, { ...fields, salutation })
+      // Fields that no longer have an input must not leak in from an older
+      // draft, and "已经查过" only counts for an application email.
+      const payload: GenerateFields = {
+        ...fields,
+        signature: undefined,
+        checked: purposes.includes('application') ? fields.checked : undefined,
+        salutation,
+      }
+      const response = await api.generate(purposes, payload)
       setData(response)
       setSubjectIndex(0)
       setSlotValues({})
@@ -334,17 +342,21 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
             </label>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block">
-                <span className="label">已经查过</span>
-                <input
-                  value={fields.checked}
-                  onChange={(event) => set('checked')(event.target.value)}
-                  className="field mt-1"
-                />
-              </label>
+              {/* Only an application email benefits from listing what the
+                  sender already looked up. */}
+              {purposes.includes('application') && (
+                <label className="block">
+                  <span className="label">已经查过</span>
+                  <input
+                    value={fields.checked}
+                    onChange={(event) => set('checked')(event.target.value)}
+                    className="field mt-1"
+                  />
+                </label>
+              )}
 
               <label className="block">
-                <span className="label">期望时间</span>
+                <span className="label">期望时间 / 本人有空的时间</span>
                 <input
                   value={fields.deadline}
                   onChange={(event) => set('deadline')(event.target.value)}
@@ -352,15 +364,6 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
                 />
               </label>
             </div>
-
-            <label className="block">
-              <span className="label">署名</span>
-              <input
-                value={fields.signature}
-                onChange={(event) => set('signature')(event.target.value)}
-                className="field mt-1"
-              />
-            </label>
           </div>
         </details>
 
