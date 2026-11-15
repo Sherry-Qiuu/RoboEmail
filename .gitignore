@@ -23,6 +23,20 @@ release/
 /data_photos*/
 /site_data/
 /dsh-session-*.zip
+
+# one-off scrape and build helpers kept in the working copy only
+/scrape_*.js
+/download_*.js
+/recover_*.js
+/build_*.js
+/build_*.py
+/check_*.js
+/smoke_test_*.js
+/prepare_*.py
+/enrich_*.js
+/assemble_*.js
+/fetch_dois*.js
+/docs/screenshots/
 *.db
 *.db-shm
 *.db-wal
