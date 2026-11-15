@@ -9,18 +9,27 @@ type Props = {
 export function SettingsPage({ user, onLoggedOut }: Props) {
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
+  const [repeat, setRepeat] = useState('')
   const [notice, setNotice] = useState('')
   const [saving, setSaving] = useState(false)
   const [leaving, setLeaving] = useState(false)
 
+  const mismatch = repeat.length > 0 && repeat !== next
+  const ready = Boolean(current) && next.length >= 8 && repeat === next
+
   async function changePassword(event: FormEvent) {
     event.preventDefault()
+    if (next !== repeat) {
+      setNotice('两次输入的新密码不一样')
+      return
+    }
     setSaving(true)
     setNotice('')
     try {
       await api.changePassword(current, next)
       setCurrent('')
       setNext('')
+      setRepeat('')
       setNotice('密码改好了，其他设备已退出')
     } catch (cause) {
       setNotice(cause instanceof Error ? cause.message : '出错了')
@@ -68,8 +77,20 @@ export function SettingsPage({ user, onLoggedOut }: Props) {
               autoComplete="new-password"
             />
           </div>
+          <div>
+            <span className="text-[12px] text-faint">再输一次新密码</span>
+            <input
+              type="password"
+              value={repeat}
+              onChange={(event) => setRepeat(event.target.value)}
+              className="field mt-1"
+              autoComplete="new-password"
+              aria-invalid={mismatch}
+            />
+          </div>
+          {mismatch && <p className="text-[12px] text-warn">两次输入的新密码不一样</p>}
           {notice && <p className="text-[12px] text-muted">{notice}</p>}
-          <button className="btn btn-ghost" disabled={saving || !current || next.length < 8}>
+          <button className="btn btn-ghost" disabled={saving || !ready}>
             {saving ? '保存中…' : '保存'}
           </button>
         </form>
