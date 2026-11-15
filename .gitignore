@@ -36,7 +36,6 @@ release/
 /enrich_*.js
 /assemble_*.js
 /fetch_dois*.js
-/docs/screenshots/
 *.db
 *.db-shm
 *.db-wal

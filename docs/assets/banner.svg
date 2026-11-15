@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="RoboEmail">
+  <defs>
+    <linearGradient id="canvas" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f8f5"/>
+      <stop offset="0.55" stop-color="#eef1ea"/>
+      <stop offset="1" stop-color="#e4ebe3"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b8768"/>
+      <stop offset="1" stop-color="#3f6549"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="320" fill="url(#canvas)"/>
+  <rect x="0.5" y="0.5" width="1199" height="319" fill="none" stroke="#dcdfd6"/>
+
+  <!-- mark: a folded letter -->
+  <rect x="96" y="104" width="112" height="112" rx="26" fill="url(#mark)"/>
+  <g stroke="#f4f7f2" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="120" y="134" width="64" height="48" rx="6"/>
+    <path d="M120 140 L152 162 L184 140"/>
+  </g>
+
+  <text x="248" y="163" font-family="'Iowan Old Style','Palatino Linotype',Georgia,'Songti SC',serif" font-size="78" letter-spacing="-1.5" fill="#191917">RoboEmail</text>
+  <text x="252" y="206" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="25" fill="#64645e">写给教授的英文邮件，从提笔到收尾</text>
+  <text x="252" y="243" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="18" fill="#8f8f88">UNNC · rbem.online</text>
+
+  <g fill="#c9cfc4">
+    <rect x="1000" y="196" width="104" height="6" rx="3"/>
+    <rect x="1000" y="216" width="72" height="6" rx="3"/>
+    <rect x="1000" y="236" width="88" height="6" rx="3"/>
+  </g>
+</svg>
