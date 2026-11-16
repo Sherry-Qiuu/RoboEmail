@@ -18,6 +18,7 @@ function navClass(active: boolean): string {
 
 export function App() {
   const [user, setUser] = useState<User | null>(null)
+  const [checking, setChecking] = useState(true)
   const [view, setView] = useState<View>('home')
   const [polishSeed, setPolishSeed] = useState('')
   const [writeSeed, setWriteSeed] = useState<Professor | null>(null)
@@ -31,7 +32,13 @@ export function App() {
       .me()
       .then((res) => setUser(res.user))
       .catch(() => undefined)
+      .finally(() => setChecking(false))
   }, [])
+
+  // Everything behind the door needs an account, so a visitor without one gets
+  // the sign-in screen instead of the app shell.
+  const signedIn = Boolean(user)
+  const gated = !checking && !signedIn && !resetToken
 
   return (
     <div className="min-h-screen">
@@ -45,58 +52,65 @@ export function App() {
           </button>
 
           <nav className="flex items-center gap-6 text-[13px]">
-            <button
-              className={navClass(view === 'write')}
-              onClick={() => {
-                setWriteSeed(null)
-                setView('write')
-              }}
-            >
-              写邮件
-            </button>
-            <button
-              className={navClass(view === 'polish')}
-              onClick={() => {
-                setPolishSeed('')
-                setView('polish')
-              }}
-            >
-              润色
-            </button>
-            <button className={navClass(view === 'people')} onClick={() => setView('people')}>
-              教授
-            </button>
-            <button className={navClass(view === 'me')} onClick={() => setView('me')}>
-              历史记录
-            </button>
-            <button className={navClass(view === 'learn')} onClick={() => setView('learn')}>
-              学习
-            </button>
-            <span className="h-3 w-px bg-rule" />
-            {user ? (
-              <button
-                className={navClass(view === 'settings')}
-                onClick={() => setView('settings')}
-              >
-                {user.username}
-              </button>
-            ) : (
-              <button className={navClass(view === 'auth')} onClick={() => setView('auth')}>
-                登录
-              </button>
+            {signedIn && (
+              <>
+                <button
+                  className={navClass(view === 'write')}
+                  onClick={() => {
+                    setWriteSeed(null)
+                    setView('write')
+                  }}
+                >
+                  写邮件
+                </button>
+                <button
+                  className={navClass(view === 'polish')}
+                  onClick={() => {
+                    setPolishSeed('')
+                    setView('polish')
+                  }}
+                >
+                  润色
+                </button>
+                <button className={navClass(view === 'people')} onClick={() => setView('people')}>
+                  教授
+                </button>
+                <button className={navClass(view === 'me')} onClick={() => setView('me')}>
+                  历史记录
+                </button>
+                <button className={navClass(view === 'learn')} onClick={() => setView('learn')}>
+                  学习
+                </button>
+                <span className="h-3 w-px bg-rule" />
+                <button
+                  className={navClass(view === 'settings')}
+                  onClick={() => setView('settings')}
+                >
+                  {user?.username}
+                </button>
+              </>
             )}
           </nav>
         </div>
       </header>
 
       <main className="mx-auto max-w-[820px] px-6 py-14">
-        {resetToken ? (
+        {checking ? (
+          <p className="text-[13px] text-faint">读取中…</p>
+        ) : resetToken ? (
           <ResetPage
             token={resetToken}
             onDone={() => {
               setResetToken('')
               window.history.replaceState({}, '', '/')
               setView('auth')
+            }}
+          />
+        ) : gated ? (
+          <AuthPage
+            onAuthed={(next) => {
+              setUser(next)
+              setView('home')
             }}
           />
         ) : (

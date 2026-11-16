@@ -194,7 +194,11 @@ export function AuthPage({ onAuthed }: Props) {
 
   return (
     <div className="mx-auto max-w-[360px] pt-10">
-      <div className="flex gap-6 border-b border-rule">
+      <p className="text-[14px] text-muted">
+        写给教授的英文邮件。登录后开始，历史记录留在这台设备，改出的错题会同步到学习页。
+      </p>
+
+      <div className="mt-8 flex gap-6 border-b border-rule">
         {(['login', 'register'] as const).map((item) => (
           <button
             key={item}
