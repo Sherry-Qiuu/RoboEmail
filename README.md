@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
   <img src="docs/assets/banner.svg" alt="RoboEmail" width="100%" />
 </p>
 
@@ -216,6 +216,7 @@ node scripts/verify-live.mjs   # 八项检查
 | [`docs/handoff.md`](docs/handoff.md) | 交接：谁做了什么、哪里容易踩坑 |
 | [`docs/handoff-two-site.md`](docs/handoff-two-site.md) | 同机双站的分工与边界 |
 | [`docs/two-site-after-filing.md`](docs/two-site-after-filing.md) | 第二站点备案通过后的收尾清单 |
+| [`docs/video-script.md`](docs/video-script.md) | 宣传视频脚本（90 秒 + 30 秒） |
 
 ---
 
