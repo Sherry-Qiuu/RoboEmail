@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, type Professor, type User } from './api'
 import { AuthPage } from './pages/AuthPage'
-import { HomePage } from './pages/HomePage'
 import { LearnPage } from './pages/LearnPage'
 import { MyPage } from './pages/MyPage'
 import { PeoplePage } from './pages/PeoplePage'
@@ -10,7 +9,7 @@ import { ResetPage } from './pages/ResetPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { WritePage } from './pages/WritePage'
 
-type View = 'home' | 'write' | 'polish' | 'auth' | 'me' | 'learn' | 'people' | 'settings'
+type View = 'write' | 'polish' | 'auth' | 'me' | 'learn' | 'people' | 'settings'
 
 function navClass(active: boolean): string {
   return `transition-colors ${active ? 'text-ink' : 'text-muted hover:text-ink'}`
@@ -19,7 +18,7 @@ function navClass(active: boolean): string {
 export function App() {
   const [user, setUser] = useState<User | null>(null)
   const [checking, setChecking] = useState(true)
-  const [view, setView] = useState<View>('home')
+  const [view, setView] = useState<View>('write')
   const [polishSeed, setPolishSeed] = useState('')
   const [writeSeed, setWriteSeed] = useState<Professor | null>(null)
   const [resetToken, setResetToken] = useState(() => {
@@ -45,7 +44,7 @@ export function App() {
       <header className="border-b border-rule">
         <div className="mx-auto flex h-16 max-w-[820px] items-center justify-between px-6">
           <button
-            onClick={() => setView('home')}
+            onClick={() => setView('write')}
             className="font-display text-[19px] tracking-tight"
           >
             RoboEmail
@@ -110,14 +109,11 @@ export function App() {
           <AuthPage
             onAuthed={(next) => {
               setUser(next)
-              setView('home')
+              setView('write')
             }}
           />
         ) : (
           <>
-        {view === 'home' && (
-          <HomePage onWrite={() => setView('write')} onPolish={() => setView('polish')} />
-        )}
         {view === 'polish' && (
           <PolishPage
             key={polishSeed}
@@ -152,7 +148,7 @@ export function App() {
           <AuthPage
             onAuthed={(next) => {
               setUser(next)
-              setView('home')
+              setView('write')
             }}
           />
         )}
@@ -162,7 +158,7 @@ export function App() {
             user={user}
             onLoggedOut={() => {
               setUser(null)
-              setView('home')
+              setView('write')
             }}
           />
         )}

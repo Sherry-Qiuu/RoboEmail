@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
   <img src="docs/assets/banner.svg" alt="RoboEmail" width="100%" />
 </p>
 
@@ -13,7 +13,7 @@
   <img alt="react" src="https://img.shields.io/badge/react-19-61dafb?logo=react&logoColor=black" />
   <img alt="hono" src="https://img.shields.io/badge/hono-4-e36002" />
   <img alt="sqlite" src="https://img.shields.io/badge/sqlite-node:sqlite-003b57?logo=sqlite&logoColor=white" />
-  <img alt="smoke" src="https://img.shields.io/badge/smoke-27%20checks-4f7a5b" />
+  <img alt="smoke" src="https://img.shields.io/badge/smoke-26%20checks-4f7a5b" />
 </p>
 
 ---
@@ -166,7 +166,7 @@ python scripts/import_profiles.py      # 三院教师主页/ -> apps/server/asse
 | `pnpm dev` | 前后端一起起 |
 | `pnpm build` | 构建前端到 `apps/web/dist` |
 | `pnpm check` | 前端所有模块的语法检查 |
-| `pnpm smoke` | 端到端回归，临时数据库，27 项检查 |
+| `pnpm smoke` | 端到端回归，临时数据库，26 项检查 |
 | `pnpm test:export` | 导出格式的离线检查 |
 | `pnpm verify:live` | 从本机检查线上：端口、证书、接口、备案号 |
 
@@ -191,7 +191,7 @@ node scripts/verify-live.mjs   # 八项检查
 ## 几条边界
 
 - **邮件正文不上云**。服务端不保存任何一封信，只保存被改出的错误片段（`before` / `after` / 中文解释 / 类别）
-- **试用不写数据**。未登录可以试 1 次，计数只在内存里，重启即清零
+- **必须先登录**。打开网站就是登录页，没有匿名试用
 - **不编造事实**。模型只能用你给的信息，缺什么留占位符
 - **称呼要准**。英国学术习惯下，只有正教授是 Professor，副教授和助理教授是 Dr
 

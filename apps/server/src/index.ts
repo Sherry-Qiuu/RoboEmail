@@ -12,11 +12,9 @@ import type { UserRow } from './db.ts'
 import {
   clearSessionCookie,
   consumeQuota,
-  consumeTrial,
   createSession,
   destroySession,
   hashPassword,
-  optionalAuth,
   requireAuth,
   SESSION_COOKIE,
   setSessionCookie,
@@ -156,16 +154,9 @@ const GenerateBody = z.object({
     .default({}),
 })
 
-// Signed-in quota is persisted; trial quota lives in memory. Either way the
-// charge happens once, before the model call.
-function charge(c: Context, user: UserRow | undefined): Response | null {
-  if (user) {
-    if (!consumeQuota(user)) return fail(c, 429, 'quota_exceeded', '今天的次数用完了')
-    return null
-  }
-  if (!consumeTrial(clientIp(c))) {
-    return fail(c, 429, 'trial_exceeded', '试用次数用完了，注册后可以继续')
-  }
+// Every model call belongs to an account, so the daily quota is the only gate.
+function charge(c: Context, user: UserRow): Response | null {
+  if (!consumeQuota(user)) return fail(c, 429, 'quota_exceeded', '今天的次数用完了')
   return null
 }
 
@@ -419,24 +410,23 @@ app.post('/api/auth/unnc', requireAuth, async (c) => {
   return c.json({ isUnnc: body.isUnnc })
 })
 
-app.post('/api/polish', optionalAuth, async (c) => {
+app.post('/api/polish', requireAuth, async (c) => {
   const body = await readBody(c, PolishBody)
   if (body instanceof Response) return body
 
-  const user = c.get('user')
-  const denied = charge(c, user)
+  const denied = charge(c, c.get('user')!)
   if (denied) return denied
 
   try {
     const out = await runPolish(body.text, body.context ?? {})
-    return c.json({ ...out, trial: !user })
+    return c.json(out)
   } catch (error) {
     console.error('[polish]', error)
     return fail(c, 502, 'model_failed', '模型暂时没响应，稍后再试')
   }
 })
 
-app.post('/api/generate', optionalAuth, async (c) => {
+app.post('/api/generate', requireAuth, async (c) => {
   const body = await readBody(c, GenerateBody)
   if (body instanceof Response) return body
 
@@ -453,13 +443,12 @@ app.post('/api/generate', optionalAuth, async (c) => {
     return fail(c, 400, 'invalid_input', '选一个写邮件的目的')
   }
 
-  const user = c.get('user')
-  const denied = charge(c, user)
+  const denied = charge(c, c.get('user')!)
   if (denied) return denied
 
   try {
     const out = await runGenerate(purposes, fields)
-    return c.json({ ...out, trial: !user })
+    return c.json(out)
   } catch (error) {
     console.error('[generate]', error)
     return fail(c, 502, 'model_failed', '模型暂时没响应，稍后再试')

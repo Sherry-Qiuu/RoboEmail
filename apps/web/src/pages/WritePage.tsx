@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   api,
-  isTrialUsed,
+  isUnauthorized,
   type GenerateFields,
   type GenerateResponse,
   type GenerateResult,
   type Professor,
 } from '../api'
 import { SlotText, fillSlots } from '../components/SlotText'
-import { TrialNote } from '../components/TrialNote'
 import { VoiceButton } from '../components/VoiceButton'
 import { readDraft, writeDraft } from '../draft'
 import { summaryLine, remember } from '../store'
@@ -142,7 +141,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
       setData(response)
       setSubjectIndex(0)
       setSlotValues({})
-      remember(response.trial, {
+      remember({
         mode: 'generate',
         title: summaryLine(response.result.subject_options[0] ?? '', '写邮件'),
         text: fillSlots(composeBody(response.result), {}),
@@ -150,8 +149,8 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
         payload: response,
       })
     } catch (cause) {
-      // Trial is one run only, so the next attempt opens sign-up directly.
-      if (isTrialUsed(cause)) {
+      // A dropped session sends the user back to sign-in instead of an error.
+      if (isUnauthorized(cause)) {
         setError('')
         onNeedAccount()
         return
@@ -466,8 +465,6 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
               重新生成
             </button>
           </div>
-
-          {data.trial && <TrialNote onRegister={onNeedAccount} />}
         </div>
       )}
     </section>

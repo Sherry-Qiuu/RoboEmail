@@ -81,8 +81,7 @@ export const requireAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   await next()
 }
 
-// Signed-in quota is persisted per user. Trial quota is in memory on purpose:
-// trial usage must leave no record behind.
+// Quota is persisted per user and resets by calendar day.
 export function consumeQuota(user: UserRow): boolean {
   const today = new Date().toISOString().slice(0, 10)
   const used = user.quota_day === today ? user.quota_used : 0
@@ -94,27 +93,5 @@ export function consumeQuota(user: UserRow): boolean {
   )
   user.quota_day = today
   user.quota_used = used + 1
-  return true
-}
-
-const trialHits = new Map<string, { day: string; used: number }>()
-
-export function consumeTrial(ip: string): boolean {
-  const today = new Date().toISOString().slice(0, 10)
-
-  // The map only ever holds today's addresses; drop yesterday's when it grows.
-  if (trialHits.size > 5000) {
-    for (const [key, value] of trialHits) {
-      if (value.day !== today) trialHits.delete(key)
-    }
-  }
-
-  const hit = trialHits.get(ip)
-  if (!hit || hit.day !== today) {
-    trialHits.set(ip, { day: today, used: 1 })
-    return true
-  }
-  if (hit.used >= env.quota.trialPerDay) return false
-  hit.used += 1
   return true
 }

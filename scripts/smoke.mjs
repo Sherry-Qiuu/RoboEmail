@@ -123,31 +123,25 @@ try {
   const health = await call('/api/health')
   check('health', health.status === 200 && health.payload.provider === 'mock')
 
-  // Anonymous users get exactly one run, then the client sends them to sign-up.
-  const firstTry = await call('/api/polish', {
-    method: 'POST',
-    body: { text: 'Dear Prof Chen, i want ask the deadline.' },
-  })
-  check('trial run allowed', firstTry.status === 200 && firstTry.payload.trial === true)
-
-  const secondTry = await call('/api/polish', {
+  // Nothing behind the door works without a session.
+  const anonPolish = await call('/api/polish', {
     method: 'POST',
     body: { text: 'Dear Prof Chen, i want ask the deadline.' },
   })
   check(
-    'trial exhausted on second run',
-    secondTry.status === 429 && secondTry.payload.error === 'trial_exceeded',
-    `status=${secondTry.status} error=${secondTry.payload.error}`,
+    'polish requires sign-in',
+    anonPolish.status === 401,
+    `status=${anonPolish.status}`,
   )
 
-  const trialGenerate = await call('/api/generate', {
+  const anonGenerate = await call('/api/generate', {
     method: 'POST',
     body: { purpose: 'inquiry', fields: { ask: 'confirm the date' } },
   })
   check(
-    'trial covers generate too',
-    trialGenerate.status === 429 && trialGenerate.payload.error === 'trial_exceeded',
-    `status=${trialGenerate.status}`,
+    'generate requires sign-in',
+    anonGenerate.status === 401,
+    `status=${anonGenerate.status}`,
   )
 
   const seeded = await waitForDirectory()

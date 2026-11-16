@@ -32,7 +32,6 @@ export type PolishResponse = {
   result: PolishResult
   addedFacts: string[]
   meta: { model: string; ms: number }
-  trial?: boolean
 }
 
 export type GenerateFields = {
@@ -60,7 +59,6 @@ export type GenerateResult = {
 export type GenerateResponse = {
   result: GenerateResult
   meta: { model: string; ms: number }
-  trial?: boolean
 }
 
 export type LearnItem = {
@@ -141,8 +139,9 @@ export class ApiError extends Error {
   }
 }
 
-export function isTrialUsed(cause: unknown): boolean {
-  return cause instanceof ApiError && cause.code === 'trial_exceeded'
+/** Session gone or never there: the only fix is to sign in again. */
+export function isUnauthorized(cause: unknown): boolean {
+  return cause instanceof ApiError && (cause.status === 401 || cause.code === 'unauthorized')
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {

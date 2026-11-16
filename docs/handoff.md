@@ -105,7 +105,7 @@ RoboEmail/
 | 教授库 | ✅ 可用 | `professors.ts`、`routes/people.ts` | 仅 UNNC 身份可见 |
 | 学习页（错题本 + 统计） | ✅ 可用 | `routes/learn.ts`、`LearnPage.tsx` | 需要登录 |
 | 我的（配额、导出） | ✅ 可用 | `MyPage.tsx`、`/api/auth/me` | |
-| 未登录试用 | ✅ 可用 | `index.ts` 的 `charge()` | 每 IP 每天 1 次，不写库 |
+| 未登录访问 | 拦截 | `App.tsx` 的 `gated` | 直接显示登录页，导航栏不渲染 |
 | 语音输入 | ✅ 可用 | `VoiceButton.tsx` | 浏览器 Web Speech API |
 | 真实发信 | ✅ 可用 | `mailer/smtp.ts` | 见第 6 节 |
 | 忘记密码 | ✅ 可用 | `index.ts`、`ResetPage.tsx` | `/api/auth/forgot` + `/api/auth/reset` + `/reset?token=` 页面 |
@@ -120,7 +120,7 @@ RoboEmail/
 1. **服务端零构建**。改 `.ts` 存盘即生效（`--watch`）。不要引入需要编译的语法（`enum`、装饰器、参数属性）。
 2. **`node:sqlite` 而非 better-sqlite3**。免编译原生模块，换机器不会卡在 node-gyp。它是 Node 内置 API，升级 Node 时留意行为变化。
 3. **邮件正文与主题不上云**。润色/生成的文本只在前端处理，服务端只记录账号、配额、错题片段。这是 PRD 第 5 节的硬约束，改接口时别把正文加进数据库。
-4. **试用不写库**。`charge()` 对未登录用户只做内存计数，服务器重启即清零；这是刻意的隐私设计。
+4. **额度只有登录用户一种**。匿名请求在路由层就被 `requireAuth` 挡掉，没有内存计数了。
 5. **邮件实现按环境变量切换，而不是按 NODE_ENV**。填了 `SMTP_HOST` + 账号密码就真发，否则打印日志。开发环境"半个配置"会降级并告警，生产环境直接启动失败（避免验证码只进日志）。
 6. **日志永远不出现完整验证码**。`mailer/smtp.ts` 只打后两位和脱敏收件人；改日志格式时保持这一条。
 7. **会话用 httpOnly cookie**，不用 JWT，因此服务端可随时吊销（`sessions` 表）。

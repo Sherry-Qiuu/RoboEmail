@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { api, categoryLabel, isTrialUsed, type PolishResponse } from '../api'
+import { api, categoryLabel, isUnauthorized, type PolishResponse } from '../api'
 import { DiffText } from '../components/DiffText'
-import { TrialNote } from '../components/TrialNote'
 import { VoiceButton } from '../components/VoiceButton'
 import { readDraft, writeDraft } from '../draft'
 import { summaryLine, remember } from '../store'
@@ -119,10 +118,9 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
     )
   }
 
-  /** The free trial is a single run, so the second attempt goes straight to
-   *  sign-up instead of leaving the user staring at an error line. */
+  /** A dropped session sends the user back to sign-in instead of an error. */
   function fail(cause: unknown): void {
-    if (isTrialUsed(cause)) {
+    if (isUnauthorized(cause)) {
       setError('')
       onNeedAccount()
       return
@@ -147,7 +145,7 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
         instruction: buildInstruction(),
       })
       setData(response)
-      remember(response.trial, {
+      remember({
         mode: 'polish',
         title: summaryLine(response.result.revised, '润色'),
         text: response.result.revised,
@@ -155,7 +153,7 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
         payload: response,
       })
 
-      if (!response.trial && response.result.errors.length > 0) {
+      if (response.result.errors.length > 0) {
         void api
           .reportErrors(
             response.result.errors.map((error) => ({
@@ -340,8 +338,6 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
               </button>
             </div>
           </div>
-
-          {data.trial && <TrialNote onRegister={onNeedAccount} />}
         </div>
       )}
     </section>

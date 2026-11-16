@@ -69,12 +69,7 @@ export const history = {
   },
 }
 
-/** Trials write nothing, so this is a no-op for anonymous use. */
-export function remember(
-  trial: boolean | undefined,
-  entry: Omit<HistoryEntry, 'id' | 'createdAt'>,
-): void {
-  if (trial) return
+export function remember(entry: Omit<HistoryEntry, 'id' | 'createdAt'>): void {
   void history.add(entry).catch(() => undefined)
 }
 
