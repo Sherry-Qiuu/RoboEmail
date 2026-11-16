@@ -162,7 +162,7 @@ export function App() {
       <footer className="mx-auto max-w-[820px] px-6 pb-10">
         <div className="border-t border-rule pt-5 text-center">
           <p className="text-[12px] text-muted">
-            联系我：
+            Contact Us (Me)：
             <a
               href="mailto:biysq6@nottingham.edu.cn"
               className="transition-colors hover:text-ink"
