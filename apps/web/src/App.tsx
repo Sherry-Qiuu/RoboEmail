@@ -8,6 +8,7 @@ import { PolishPage } from './pages/PolishPage'
 import { ResetPage } from './pages/ResetPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { WritePage } from './pages/WritePage'
+import { BrandMark } from './components/BrandMark'
 
 type View = 'write' | 'polish' | 'auth' | 'me' | 'learn' | 'people' | 'settings'
 
@@ -45,9 +46,14 @@ export function App() {
         <div className="mx-auto flex h-16 max-w-[820px] items-center justify-between px-6">
           <button
             onClick={() => setView('write')}
-            className="font-display text-[19px] tracking-tight"
+            className="flex items-center gap-[11px]"
+            aria-label="RoboEmail 首页"
           >
-            RoboEmail
+            <BrandMark className="h-[29px] w-[29px] shrink-0" />
+            <span className="brand-wordmark text-[19px] leading-none" aria-hidden="true">
+              <span className="text-ink">Robo</span>
+              <span className="text-accent">Email</span>
+            </span>
           </button>
 
           <nav className="flex items-center gap-6 text-[13px]">

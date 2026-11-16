@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoboEmail · 品牌标识</title>
+    <style>
+      @font-face {
+        font-family: 'Newsreader';
+        src: url('fonts/newsreader-wordmark.woff2') format('woff2');
+        font-weight: 400;
+        font-display: swap;
+      }
+
+      :root {
+        --sage: #4f7a5b;
+        --sage-deep: #3f6549;
+        --sage-light: #a8c9a6;
+        --ink: #191917;
+        --paper: #f3f3f1;
+        --muted: #6f6f68;
+        --faint: #9b9b93;
+        --rule: #e6e4dc;
+        --surface: #ffffff;
+        --bg: var(--paper);
+        color-scheme: light;
+      }
+
+      body.dark {
+        --bg: #191917;
+        --ink: #f3f3f1;
+        --muted: #a3a39b;
+        --faint: #6f6f68;
+        --rule: #2c2c2a;
+        --surface: #202020;
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          14px/1.65 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          'PingFang SC',
+          'Microsoft YaHei',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition:
+          background 160ms ease,
+          color 160ms ease;
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 40px 32px 96px;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .micro {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .toggle {
+        border: 1px solid var(--rule);
+        background: transparent;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .toggle:hover {
+        color: var(--ink);
+        border-color: var(--faint);
+      }
+
+      section {
+        padding: 72px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      section:last-of-type {
+        border-bottom: 0;
+      }
+
+      .label {
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: var(--faint);
+        margin-bottom: 28px;
+      }
+
+      .hero {
+        display: flex;
+        justify-content: center;
+        padding: 24px 0 8px;
+      }
+
+      .hero img {
+        width: min(100%, 660px);
+        height: auto;
+      }
+
+      .dark-only {
+        display: none;
+      }
+
+      body.dark .light-only {
+        display: none;
+      }
+
+      body.dark .dark-only {
+        display: block;
+      }
+
+      .ink-panel {
+        background: #191917;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 72px 32px;
+      }
+
+      .ink-panel img {
+        width: min(100%, 520px);
+        height: auto;
+      }
+
+      .sizes {
+        display: flex;
+        align-items: flex-end;
+        gap: 40px;
+        flex-wrap: wrap;
+      }
+
+      .size {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .size img {
+        display: block;
+      }
+
+      .size span {
+        font-size: 11px;
+        color: var(--faint);
+      }
+
+      .apps {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+
+      .apps figure {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .apps img {
+        display: block;
+      }
+
+      .apps figcaption {
+        font-size: 11px;
+        color: var(--faint);
+      }
+
+      .tabs {
+        width: 100%;
+        max-width: 480px;
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .tabbar {
+        display: flex;
+        gap: 4px;
+        background: var(--rule);
+        padding: 8px 8px 0;
+      }
+
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border-radius: 7px 7px 0 0;
+        padding: 8px 14px;
+        font-size: 12px;
+        color: var(--ink);
+      }
+
+      .tab img {
+        width: 15px;
+        height: 15px;
+      }
+
+      .tab.off {
+        background: transparent;
+        color: var(--muted);
+      }
+
+      .tabpage {
+        padding: 22px 22px 26px;
+      }
+
+      .tabpage p {
+        margin: 0 0 6px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--faint);
+      }
+
+      .tabpage strong {
+        font-family: 'Songti SC', 'Noto Serif SC', Georgia, serif;
+        font-weight: 400;
+        font-size: 24px;
+      }
+
+      .palette {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 24px;
+      }
+
+      .swatch div:first-child {
+        height: 96px;
+        border-radius: 4px;
+        border: 1px solid var(--rule);
+      }
+
+      .swatch p {
+        margin: 12px 0 0;
+        font-size: 12px;
+      }
+
+      .swatch span {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.04em;
+      }
+
+      .header-demo {
+        border: 1px solid var(--rule);
+        background: var(--bg);
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .brand img {
+        width: 29px;
+        height: 29px;
+      }
+
+      .wordmark {
+        font-family: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+        font-size: 19px;
+        letter-spacing: -0.014em;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .wordmark .a {
+        color: var(--ink);
+      }
+
+      .wordmark .b {
+        color: var(--sage);
+      }
+
+      body.dark .wordmark .b {
+        color: var(--sage-light);
+      }
+
+      .nav {
+        display: flex;
+        gap: 24px;
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        padding-top: 40px;
+        font-size: 11px;
+        color: var(--faint);
+      }
+
+      @media (max-width: 640px) {
+        .wrap {
+          padding: 24px 20px 64px;
+        }
+        section {
+          padding: 48px 0;
+        }
+        .nav {
+          display: none;
+        }
+        .ink-panel {
+          padding: 40px 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <span class="micro">RoboEmail · rbem.online</span>
+        <button class="toggle" id="toggle" type="button">深色预览</button>
+      </div>
+
+      <section>
+        <p class="label">主标 / Primary lockup</p>
+        <div class="hero">
+          <img class="light-only" src="logo-primary.svg" alt="RoboEmail" />
+          <img class="dark-only" src="logo-primary-dark.svg" alt="RoboEmail" />
+        </div>
+      </section>
+
+      <section>
+        <p class="label">深色底 / On ink</p>
+        <div class="ink-panel">
+          <img src="logo-primary-dark.svg" alt="RoboEmail" />
+        </div>
+      </section>
+
+      <section>
+        <p class="label">标记 / Mark</p>
+        <div class="sizes">
+          <span class="size"><img src="logo-mark.svg" width="128" height="128" alt="" /><span>128</span></span>
+          <span class="size"><img src="logo-mark.svg" width="80" height="80" alt="" /><span>80</span></span>
+          <span class="size"><img src="logo-mark.svg" width="48" height="48" alt="" /><span>48</span></span>
+          <span class="size"><img src="logo-mark.svg" width="32" height="32" alt="" /><span>32</span></span>
+          <span class="size"><img src="logo-mark.svg" width="24" height="24" alt="" /><span>24</span></span>
+          <span class="size"><img src="logo-mark.svg" width="16" height="16" alt="" /><span>16</span></span>
+        </div>
+      </section>
+
+      <section>
+        <p class="label">应用 / App</p>
+        <div class="apps">
+          <figure>
+            <img src="app-icon.svg" width="180" height="180" alt="RoboEmail app icon" />
+            <figcaption>1024 · 圆角</figcaption>
+          </figure>
+          <figure>
+            <img src="app-icon-square.svg" width="180" height="180" alt="RoboEmail app icon" />
+            <figcaption>iOS · 满版</figcaption>
+          </figure>
+          <figure class="tabs">
+            <div class="tabbar">
+              <span class="tab"><img src="favicon.svg" alt="" />RoboEmail</span>
+              <span class="tab off">教授</span>
+              <span class="tab off">学习</span>
+            </div>
+            <div class="tabpage">
+              <p>写给教授的英文邮件，从提笔到收尾</p>
+              <strong>不编造，不越界</strong>
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <section>
+        <p class="label">颜色 / Palette</p>
+        <div class="palette">
+          <div class="swatch">
+            <div style="background: #4f7a5b"></div>
+            <p>Sage</p>
+            <span>#4F7A5B</span>
+          </div>
+          <div class="swatch">
+            <div style="background: #3f6549"></div>
+            <p>Sage Deep</p>
+            <span>#3F6549</span>
+          </div>
+          <div class="swatch">
+            <div style="background: #a8c9a6"></div>
+            <p>Sage Light</p>
+            <span>#A8C9A6</span>
+          </div>
+          <div class="swatch">
+            <div style="background: #191917"></div>
+            <p>Ink</p>
+            <span>#191917</span>
+          </div>
+          <div class="swatch">
+            <div style="background: #f3f3f1"></div>
+            <p>Paper</p>
+            <span>#F3F3F1</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <p class="label">站内页眉 / In the header</p>
+        <div class="header-demo">
+          <span class="brand">
+            <img class="light-only" src="logo-mark.svg" alt="" />
+            <img class="dark-only" src="logo-mark-dark.svg" alt="" />
+            <span class="wordmark"><span class="a">Robo</span><span class="b">Email</span></span>
+          </span>
+          <span class="nav"><span>写邮件</span><span>润色</span><span>教授</span><span>历史记录</span><span>学习</span></span>
+        </div>
+      </section>
+
+      <footer>
+        <span>RoboEmail · 宁波诺丁汉大学 · 英文邮件写作助手</span>
+        <span>Newsreader · Sage / Ink / Paper</span>
+      </footer>
+    </div>
+
+    <script>
+      const button = document.getElementById('toggle')
+      const setTheme = (dark) => {
+        document.body.classList.toggle('dark', dark)
+        button.textContent = dark ? '浅色预览' : '深色预览'
+      }
+      setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches)
+      button.addEventListener('click', () => setTheme(!document.body.classList.contains('dark')))
+    </script>
+  </body>
+</html>

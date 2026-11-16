@@ -1,8 +1,35 @@
 @import 'tailwindcss';
 
+/* Wordmark subset: only the nine letters of "RoboEmail" (1.6 kB, OFL). */
+@font-face {
+  font-family: 'Newsreader Brand';
+  src: url('/fonts/newsreader-wordmark.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The mark is one drawing: sheet and letter swap colors on dark backgrounds. */
+:root {
+  --brand-mark-bg: #4f7a5b;
+  --brand-mark-fg: #f3f3f1;
+}
+
+[data-edge-mode='dark'] {
+  --brand-mark-bg: #f3f3f1;
+  --brand-mark-fg: #191917;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-edge-mode]) {
+    --brand-mark-bg: #f3f3f1;
+    --brand-mark-fg: #191917;
+  }
+}
+
 /*
  * Colour comes from the Edge Fluent appearance runtime (public/edge-theme.js),
- * which writes --edge-* on <html> for light/dark and the five colour themes.
+ * which writes --edge-* on <html> for light/dark and the five color themes.
  * Every token keeps a literal fallback so the page still renders if that script
  * is blocked or the CSP refuses it.
  */
@@ -65,6 +92,13 @@
 }
 
 @layer components {
+  .brand-wordmark {
+    font-family: 'Newsreader Brand', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.014em;
+    font-kerning: normal;
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;

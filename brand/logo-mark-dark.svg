@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="RoboEmail">
+  <title>RoboEmail</title>
+  <g transform="translate(0 0)">
+    <g transform="scale(1)"><path d="M0 14C0 6.3 6.3 0 14 0H44L64 20V50C64 57.7 57.7 64 50 64H14C6.3 64 0 57.7 0 50Z" fill="#F3F3F1"/></g>
+    <g transform="translate(16.63 11.50) scale(0.05694) translate(-90 -90)">
+      <path d="M90 90H210V810H90ZM205 90H465L555 180V430H205ZM275 160V360H485V209L436 160ZM245 420H385L635 810H495Z" fill="#191917" fill-rule="nonzero"/>
+    </g>
+  </g>
+</svg>
