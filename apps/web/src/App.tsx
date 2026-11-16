@@ -161,11 +161,27 @@ export function App() {
 
       <footer className="mx-auto max-w-[820px] px-6 pb-10">
         <div className="border-t border-rule pt-5 text-center">
+          <p className="text-[12px] text-muted">
+            联系我：
+            <a
+              href="mailto:biysq6@nottingham.edu.cn"
+              className="transition-colors hover:text-ink"
+            >
+              biysq6@nottingham.edu.cn
+            </a>
+            <span className="text-faint">（学校邮箱）</span>
+            <span className="mx-2 text-faint">/</span>
+            <a href="mailto:19558222390@163.com" className="transition-colors hover:text-ink">
+              19558222390@163.com
+            </a>
+            <span className="text-faint">（个人邮箱）</span>
+          </p>
+
           <a
             href="https://beian.miit.gov.cn/"
             target="_blank"
             rel="noreferrer"
-            className="text-[11px] text-faint transition-colors hover:text-ink"
+            className="mt-3 inline-block text-[11px] text-faint transition-colors hover:text-ink"
           >
             浙ICP备2026097271号
           </a>
