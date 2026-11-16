@@ -116,6 +116,23 @@ taskkill /PID <上面查到的PID> /F
 
 必须登录后才能使用。未登录时打开网站直接是登录/注册页，导航栏也不显示。
 
+### 反馈
+
+- 结果页底部有一行「这次结果有用吗」，点一下即可，不填任何东西
+- 页脚「反馈」可以写一段文字；点「没用」时也会直接展开表单
+- 提交时自动带上页面和版本号
+
+查看收到的反馈（在服务器上跑，直连数据库）：
+
+```bash
+node scripts/feedback.mjs              # 最近 20 条
+node scripts/feedback.mjs --unread     # 只看未处理
+node scripts/feedback.mjs --done <id>  # 标记已处理
+node scripts/feedback.mjs --json       # 导出 JSON
+```
+
+想同时收邮件，在 `.env` 里填 `FEEDBACK_EMAIL=你的邮箱`，然后 `docker compose up -d --force-recreate app`。
+
 ---
 
 ## 5. 环境变量

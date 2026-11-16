@@ -14,6 +14,15 @@ export const CURRENT_VERSION = __APP_VERSION__
 
 export const RELEASES: Release[] = [
   {
+    version: '1.1.0',
+    date: '2026-11-16',
+    items: [
+      '结果页多了一行「这次结果有用吗」，点一下就好',
+      '页脚加了「反馈」，想说什么可以直接写',
+      '反馈会带上页面和版本，方便定位问题',
+    ],
+  },
+  {
     version: '1.0.0',
     date: '2026-11-16',
     items: [

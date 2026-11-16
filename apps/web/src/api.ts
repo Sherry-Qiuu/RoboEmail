@@ -223,6 +223,19 @@ export const api = {
       body: JSON.stringify({ items }),
     }),
 
+  feedback: (payload: {
+    rating?: 0 | 1
+    page?: string
+    version?: string
+    title?: string
+    body?: string
+    contactOk?: boolean
+  }) =>
+    request<{ ok: boolean }>('/api/feedback', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
   insights: () => request<Insights>('/api/insights'),
 
   setMastered: (id: string) =>

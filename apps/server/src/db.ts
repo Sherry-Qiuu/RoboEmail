@@ -93,6 +93,24 @@ CREATE INDEX IF NOT EXISTS idx_errors_user ON errors(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_errors_dedupe ON errors(user_id, before, after);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash);
 CREATE INDEX IF NOT EXISTS idx_codes_email ON email_codes(email, purpose, created_at);
+
+-- Suggestions and one-click ratings. Bodies are user-written notes, never the
+-- email itself: the form asks for a description of the problem.
+CREATE TABLE IF NOT EXISTS feedback (
+  id         TEXT PRIMARY KEY,
+  user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  kind       TEXT NOT NULL,
+  rating     INTEGER,
+  page       TEXT,
+  version    TEXT,
+  title      TEXT,
+  body       TEXT,
+  contact_ok INTEGER NOT NULL DEFAULT 0,
+  handled_at TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at);
 `)
 
 // The column is UNIQUE, but SQLite compares it case-sensitively. Logging in is

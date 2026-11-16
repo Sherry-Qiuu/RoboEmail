@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, type Professor, type User } from './api'
+import { openFeedback } from './feedback'
 import { AuthPage } from './pages/AuthPage'
 import { LearnPage } from './pages/LearnPage'
 import { MyPage } from './pages/MyPage'
@@ -213,6 +214,13 @@ export function App() {
               <img src="/gongan.png" alt="" width={14} height={14} className="h-[14px] w-[14px]" />
               浙公网安备33021202004698号
             </a>
+
+            <button
+              className="text-[11px] text-faint transition-colors hover:text-ink"
+              onClick={() => openFeedback({ page: 'footer' })}
+            >
+              反馈
+            </button>
           </div>
         </div>
       </footer>

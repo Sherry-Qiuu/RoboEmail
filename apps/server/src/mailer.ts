@@ -1,6 +1,17 @@
 import { env } from './env.ts'
 import { createSmtpMailer } from './mailer/smtp.ts'
 
+/** What the owner receives when someone submits a suggestion. */
+export type FeedbackMail = {
+  username: string
+  page: string
+  version: string
+  rating?: number
+  title: string
+  body: string
+  contactOk: boolean
+}
+
 /**
  * The only surface the SMTP work needs. Implementations must not touch the
  * database; they receive a plain recipient plus the secret to deliver.
@@ -8,6 +19,7 @@ import { createSmtpMailer } from './mailer/smtp.ts'
 export interface Mailer {
   sendVerificationCode(to: string, code: string): Promise<void>
   sendPasswordReset(to: string, token: string): Promise<void>
+  sendFeedback(to: string, note: FeedbackMail): Promise<void>
 }
 
 export const consoleMailer: Mailer = {
@@ -16,6 +28,11 @@ export const consoleMailer: Mailer = {
   },
   async sendPasswordReset(to, token): Promise<void> {
     console.log(`[mailer:console] password reset link  to=${to}  token=${token}`)
+  },
+  async sendFeedback(to, note): Promise<void> {
+    console.log(
+      `[mailer:console] feedback  to=${to}  page=${note.page}  title=${note.title}  body=${note.body.slice(0, 80)}`,
+    )
   },
 }
 

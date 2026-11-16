@@ -164,6 +164,15 @@ const GenerateBody = z.object({
     .default({}),
 })
 
+const FeedbackBody = z.object({
+  rating: z.number().int().min(0).max(1).optional(),
+  page: z.string().max(30).optional(),
+  version: z.string().max(20).optional(),
+  title: z.string().max(120).optional(),
+  body: z.string().max(1000).optional(),
+  contactOk: z.boolean().optional().default(false),
+})
+
 // Every model call belongs to an account, so the daily quota is the only gate.
 function charge(c: Context, user: UserRow): Response | null {
   if (!consumeQuota(user)) return fail(c, 429, 'quota_exceeded', '今天的次数用完了')
@@ -468,6 +477,60 @@ app.post('/api/generate', requireAuth, async (c) => {
 
 app.route('/api', learn)
 app.route('/api', people)
+
+app.post('/api/feedback', requireAuth, async (c) => {
+  const body = await readBody(c, FeedbackBody)
+  if (body instanceof Response) return body
+
+  const user = c.get('user')!
+  const text = (body.body ?? '').trim()
+  const title = (body.title ?? '').trim()
+
+  if (!text && body.rating === undefined) {
+    return fail(c, 400, 'invalid_input', '写一句话，或者点一下有用 / 没用')
+  }
+
+  // Ratings are cheap and frequent; written notes are not. Separate buckets so
+  // one never blocks the other.
+  const allowed = text
+    ? allow(`feedback:note:${user.id}`, 5, 3_600_000)
+    : allow(`feedback:rating:${user.id}`, 30, 3_600_000)
+  if (!allowed) return fail(c, 429, 'rate_limited', '提交太勤了，过一会儿再说')
+
+  const now = nowIso()
+  db.prepare(
+    `INSERT INTO feedback (id, user_id, kind, rating, page, version, title, body, contact_ok, handled_at, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)`,
+  ).run(
+    newId(),
+    user.id,
+    text ? 'note' : 'rating',
+    body.rating ?? null,
+    (body.page ?? '').slice(0, 30),
+    body.version ?? '',
+    title || null,
+    text || null,
+    body.contactOk ? 1 : 0,
+    now,
+  )
+
+  // The mail is a convenience for the owner; a failure must not fail the user.
+  if (text && env.feedbackEmail) {
+    void mailer
+      .sendFeedback(env.feedbackEmail, {
+        username: user.username,
+        page: body.page ?? '',
+        version: body.version ?? '',
+        rating: body.rating,
+        title,
+        body: text,
+        contactOk: Boolean(body.contactOk),
+      })
+      .catch((error) => console.error('[feedback] mail failed', error))
+  }
+
+  return c.json({ ok: true })
+})
 
 // In production the built frontend sits next to the server, so one container can
 // serve both. In development Vite owns :5173 and this block does nothing.

@@ -7,6 +7,7 @@ import {
   type GenerateResult,
   type Professor,
 } from '../api'
+import { ResultRating } from '../components/ResultRating'
 import { SlotText, fillSlots } from '../components/SlotText'
 import { VoiceButton } from '../components/VoiceButton'
 import { readDraft, writeDraft } from '../draft'
@@ -465,6 +466,8 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
               重新生成
             </button>
           </div>
+
+          <ResultRating page="write" />
         </div>
       )}
     </section>

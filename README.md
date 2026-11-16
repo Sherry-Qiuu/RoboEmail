@@ -14,7 +14,7 @@
 
 <br />
 
-<a href="https://rbem.online"><img alt="live" src="https://img.shields.io/badge/live-rbem.online-4f7a5b?style=flat-square" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=stars" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/commits/main"><img alt="last commit" src="https://img.shields.io/github/last-commit/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=last%20commit" /></a> <img alt="node" src="https://img.shields.io/badge/node-24-5fa04e?style=flat-square&logo=nodedotjs&logoColor=white" /> <img alt="react" src="https://img.shields.io/badge/react-19-61dafb?style=flat-square&logo=react&logoColor=black" /> <img alt="hono" src="https://img.shields.io/badge/hono-4-e36002?style=flat-square" /> <img alt="sqlite" src="https://img.shields.io/badge/sqlite-node%3Asqlite-003b57?style=flat-square&logo=sqlite&logoColor=white" /> <img alt="smoke" src="https://img.shields.io/badge/smoke-26%20checks-4f7a5b?style=flat-square" /> <img alt="version" src="https://img.shields.io/badge/version-1.0.0-4f7a5b?style=flat-square" />
+<a href="https://rbem.online"><img alt="live" src="https://img.shields.io/badge/live-rbem.online-4f7a5b?style=flat-square" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=stars" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/commits/main"><img alt="last commit" src="https://img.shields.io/github/last-commit/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=last%20commit" /></a> <img alt="node" src="https://img.shields.io/badge/node-24-5fa04e?style=flat-square&logo=nodedotjs&logoColor=white" /> <img alt="react" src="https://img.shields.io/badge/react-19-61dafb?style=flat-square&logo=react&logoColor=black" /> <img alt="hono" src="https://img.shields.io/badge/hono-4-e36002?style=flat-square" /> <img alt="sqlite" src="https://img.shields.io/badge/sqlite-node%3Asqlite-003b57?style=flat-square&logo=sqlite&logoColor=white" /> <img alt="smoke" src="https://img.shields.io/badge/smoke-31%20checks-4f7a5b?style=flat-square" /> <img alt="version" src="https://img.shields.io/badge/version-1.1.0-4f7a5b?style=flat-square" />
 
 <br />
 
@@ -275,7 +275,7 @@ pnpm 11 默认不执行依赖的安装脚本，会把 esbuild 的 postinstall �
 | `pnpm dev:web` | 只起 Vite |
 | `pnpm build` | 构建前端到 `apps/web/dist` |
 | `pnpm check` | 前端所有模块的语法检查 |
-| `pnpm smoke` | 端到端回归，临时数据库，26 项检查 |
+| `pnpm smoke` | 端到端回归，临时数据库，31 项检查 |
 | `pnpm test:export` | 导出格式的离线检查 |
 | `pnpm verify:live` | 从本机检查线上：端口、证书、接口、备案号 |
 
@@ -304,6 +304,18 @@ node scripts/verify-live.mjs
 改完 `.env` 必须 `docker compose up -d --force-recreate app`，`restart` 不会重新读取环境变量。
 
 完整流程（买服务器 → 配 DNS → 备案 → 起服务 → 第二站点）见 [`docs/deploy.md`](docs/deploy.md)，同机双站的分工见 [`docs/handoff-two-site.md`](docs/handoff-two-site.md)。
+
+## 反馈
+
+结果页有一行「这次结果有用吗」，页脚有「反馈」入口。文字建议存进 `feedback` 表，界面里没有后台——用命令行看：
+
+```bash
+node scripts/feedback.mjs            # 最近 20 条
+node scripts/feedback.mjs --unread   # 只看没处理的
+node scripts/feedback.mjs --done <id> # 标记已处理
+```
+
+在 `.env` 里填 `FEEDBACK_EMAIL=你的邮箱`，收到文字建议时会同时发一封信；不填就只入库。
 
 ## 几条边界
 

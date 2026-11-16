@@ -8,7 +8,7 @@
  *   node scripts/smoke.mjs
  */
 
-import { spawn } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import { readFileSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
@@ -300,6 +300,52 @@ try {
     body: { username: 'smoke', password: 'newsmokepass456' },
   })
   check('new password works', newLogin.status === 200)
+
+  // Feedback: one-click ratings and written notes share a route, and the note
+  // must actually land in the table the CLI reads.
+  const rating = await call('/api/feedback', {
+    method: 'POST',
+    body: { rating: 1, page: 'polish', version: '1.0.0' },
+  })
+  check('feedback rating accepted', rating.status === 200, `status=${rating.status}`)
+
+  const note = await call('/api/feedback', {
+    method: 'POST',
+    body: {
+      page: 'write',
+      version: '1.0.0',
+      title: '称呼不对',
+      body: '写给讲师的邮件应该用 Dr。',
+      contactOk: true,
+    },
+  })
+  check('feedback note accepted', note.status === 200, `status=${note.status}`)
+
+  const emptyFeedback = await call('/api/feedback', { method: 'POST', body: {} })
+  check('empty feedback rejected', emptyFeedback.status === 400, `status=${emptyFeedback.status}`)
+
+  {
+    const probe = new DatabaseSync(dbPath, { readOnly: true })
+    const rows = probe
+      .prepare("SELECT kind, rating FROM feedback WHERE kind IN ('rating','note')")
+      .all()
+    probe.close()
+    check(
+      'feedback stored',
+      rows.length === 2 && rows.some((row) => row.kind === 'note'),
+      `${rows.length} rows`,
+    )
+  }
+
+  // The owner reads suggestions through the CLI, so it has to see the row too.
+  {
+    const cli = execFileSync(process.execPath, ['scripts/feedback.mjs'], {
+      cwd: root,
+      env: { ...process.env, DB_PATH: dbPath },
+      encoding: 'utf8',
+    })
+    check('feedback cli lists the note', cli.includes('称呼不对'), cli.split('\n').length + ' lines')
+  }
 
   // Usernames may be Chinese, and must stay unique regardless of case.
   const chinese = await call('/api/auth/register', {

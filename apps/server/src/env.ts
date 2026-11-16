@@ -46,6 +46,9 @@ export const env = {
     timeoutMs: Number(process.env.SMTP_TIMEOUT_MS ?? 15_000),
   },
   appOrigin: (process.env.APP_ORIGIN ?? 'http://localhost:5173').replace(/\/$/, ''),
+  // Where suggestions are forwarded. Empty means "store them only"; the CLI in
+  // scripts/feedback.mjs still reads them from the database.
+  feedbackEmail: process.env.FEEDBACK_EMAIL ?? '',
 }
 
 export const isDev = env.nodeEnv !== 'production'

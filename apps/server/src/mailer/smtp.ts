@@ -1,5 +1,5 @@
 import nodemailer, { type SendMailOptions, type Transporter } from 'nodemailer'
-import type { Mailer } from '../mailer.ts'
+import type { FeedbackMail, Mailer } from '../mailer.ts'
 
 export interface SmtpConfig {
   host: string
@@ -17,7 +17,7 @@ interface OutgoingMail {
   html: string
 }
 
-type Purpose = 'verify' | 'reset'
+type Purpose = 'verify' | 'reset' | 'feedback'
 
 // The copy lives here once and is reused by the text and the HTML body, so the
 // two versions cannot drift apart.
@@ -54,6 +54,40 @@ function buildVerificationMail(code: string): OutgoingMail {
   )
 
   return { subject: 'RoboEmail 验证码', text, html }
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function buildFeedbackMail(note: FeedbackMail): OutgoingMail {
+  const lines = [
+    `页面：${note.page || '未知'}`,
+    `版本：v${note.version}`,
+    `用户：${note.username}`,
+    note.rating === undefined ? '' : `评分：${note.rating === 1 ? '有用' : '没用'}`,
+    note.contactOk ? '用户同意回复，可以直接回这封信' : '用户没有要求回复',
+    '',
+    note.title ? `标题：${note.title}` : '',
+    '',
+    note.body,
+  ].filter((line) => line !== undefined)
+
+  const html = wrapHtml(
+    `<p style="margin:0 0 4px;font-size:13px;color:#57606a">${escapeHtml(note.page || '未知')} · v${escapeHtml(note.version)} · ${escapeHtml(note.username)}</p>` +
+      (note.title ? `<h2 style="font-size:17px;margin:12px 0 8px">${escapeHtml(note.title)}</h2>` : '') +
+      `<p style="white-space:pre-wrap;margin:0">${escapeHtml(note.body)}</p>` +
+      `<p style="font-size:12px;color:#57606a;margin-top:16px">${note.contactOk ? '用户同意回复' : '用户没有要求回复'}</p>`,
+  )
+
+  return {
+    subject: `[RoboEmail] 建议 · ${note.page || '未知'} · v${note.version}`,
+    text: lines.join('\n'),
+    html,
+  }
 }
 
 function buildPasswordResetMail(appOrigin: string, token: string): OutgoingMail {
@@ -145,6 +179,9 @@ export function createSmtpMailer(config: SmtpConfig, appOrigin: string): Mailer 
         'reset',
         `token=${maskSecret(token)}`,
       )
+    },
+    async sendFeedback(to, note): Promise<void> {
+      await deliver(to, buildFeedbackMail(note), 'feedback', `page=${note.page}`)
     },
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, categoryLabel, isUnauthorized, type PolishResponse } from '../api'
 import { DiffText } from '../components/DiffText'
+import { ResultRating } from '../components/ResultRating'
 import { VoiceButton } from '../components/VoiceButton'
 import { readDraft, writeDraft } from '../draft'
 import { summaryLine, remember } from '../store'
@@ -338,6 +339,8 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
               </button>
             </div>
           </div>
+
+          <ResultRating page="polish" />
         </div>
       )}
     </section>
