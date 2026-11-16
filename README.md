@@ -14,7 +14,7 @@
 
 <br />
 
-<a href="https://rbem.online"><img alt="live" src="https://img.shields.io/badge/live-rbem.online-4f7a5b?style=flat-square" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=stars" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/commits/main"><img alt="last commit" src="https://img.shields.io/github/last-commit/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=last%20commit" /></a> <img alt="node" src="https://img.shields.io/badge/node-24-5fa04e?style=flat-square&logo=nodedotjs&logoColor=white" /> <img alt="react" src="https://img.shields.io/badge/react-19-61dafb?style=flat-square&logo=react&logoColor=black" /> <img alt="hono" src="https://img.shields.io/badge/hono-4-e36002?style=flat-square" /> <img alt="sqlite" src="https://img.shields.io/badge/sqlite-node%3Asqlite-003b57?style=flat-square&logo=sqlite&logoColor=white" /> <img alt="smoke" src="https://img.shields.io/badge/smoke-26%20checks-4f7a5b?style=flat-square" />
+<a href="https://rbem.online"><img alt="live" src="https://img.shields.io/badge/live-rbem.online-4f7a5b?style=flat-square" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=stars" /></a> <a href="https://github.com/Sherry-Qiuu/RoboEmail/commits/main"><img alt="last commit" src="https://img.shields.io/github/last-commit/Sherry-Qiuu/RoboEmail?style=flat-square&color=4f7a5b&label=last%20commit" /></a> <img alt="node" src="https://img.shields.io/badge/node-24-5fa04e?style=flat-square&logo=nodedotjs&logoColor=white" /> <img alt="react" src="https://img.shields.io/badge/react-19-61dafb?style=flat-square&logo=react&logoColor=black" /> <img alt="hono" src="https://img.shields.io/badge/hono-4-e36002?style=flat-square" /> <img alt="sqlite" src="https://img.shields.io/badge/sqlite-node%3Asqlite-003b57?style=flat-square&logo=sqlite&logoColor=white" /> <img alt="smoke" src="https://img.shields.io/badge/smoke-26%20checks-4f7a5b?style=flat-square" /> <img alt="version" src="https://img.shields.io/badge/version-1.0.0-4f7a5b?style=flat-square" />
 
 <br />
 
@@ -279,6 +279,18 @@ pnpm 11 默认不执行依赖的安装脚本，会把 esbuild 的 postinstall �
 | `pnpm test:export` | 导出格式的离线检查 |
 | `pnpm verify:live` | 从本机检查线上：端口、证书、接口、备案号 |
 
+## 版本
+
+版本号写在根目录 `package.json` 的 `version`，前端构建和服务端 `/api/health` 都读这一个字段。
+
+发版三步：
+
+1. 改 `package.json` 的 `version`
+2. 在 [`apps/web/src/changelog.ts`](apps/web/src/changelog.ts) 顶部加一条（访客打开网页时看到的就是它）
+3. 在 [`CHANGELOG.md`](CHANGELOG.md) 顶部加一节
+
+弹窗按版本号判断：浏览器 `localStorage` 记着上次看过的版本，对不上才弹一次。
+
 ## 部署
 
 Docker Compose + Caddy，一台 2C2G 的轻量服务器够用。Caddy 独占 80/443 并自动续证书，应用容器不对外发布端口。
@@ -322,6 +334,8 @@ node scripts/verify-live.mjs
 | [`docs/handoff-two-site.md`](docs/handoff-two-site.md) | 同机双站的分工与边界 |
 | [`docs/two-site-after-filing.md`](docs/two-site-after-filing.md) | 第二站点备案通过后的收尾清单 |
 | [`docs/handoff-mailer.md`](docs/handoff-mailer.md) | 发信模块的交接说明 |
+| [`docs/video-script.md`](docs/video-script.md) | 宣传视频脚本（90 秒 + 30 秒） |
+| [`CHANGELOG.md`](CHANGELOG.md) | 版本更新日志 |
 
 ## 联系
 

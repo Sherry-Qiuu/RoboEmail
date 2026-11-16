@@ -1,5 +1,5 @@
 import { randomBytes, randomInt } from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
@@ -62,6 +62,16 @@ function clientIp(c: Context): string {
   if (forwarded) return forwarded.split(',')[0]!.trim()
   return 'local'
 }
+
+/** The single source of truth is the root package.json, shared with the web build. */
+const VERSION = (() => {
+  try {
+    const raw = readFileSync(resolve(import.meta.dirname, '../../../package.json'), 'utf8')
+    return (JSON.parse(raw) as { version?: string }).version ?? '0.0.0'
+  } catch {
+    return '0.0.0'
+  }
+})()
 
 function issueCode(email: string, purpose: string): string {
   const normalized = email.toLowerCase()
@@ -163,6 +173,7 @@ function charge(c: Context, user: UserRow): Response | null {
 app.get('/api/health', (c) =>
   c.json({
     ok: true,
+    version: VERSION,
     provider: env.llm.apiKey ? env.llm.model : 'mock',
     env: env.nodeEnv,
   }),

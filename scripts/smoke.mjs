@@ -13,9 +13,24 @@ import { readFileSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { createHash, randomUUID } from 'node:crypto'
+import net from 'node:net'
 
 const root = resolve(import.meta.dirname, '..')
-const port = process.env.SMOKE_PORT ?? '8899'
+
+/** Ask the OS for a free port: a fixed one collides with whatever else is running. */
+function freePort() {
+  return new Promise((done, fail) => {
+    const server = net.createServer()
+    server.on('error', fail)
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address()
+      const chosen = typeof address === 'object' && address ? address.port : 0
+      server.close(() => done(chosen))
+    })
+  })
+}
+
+const port = process.env.SMOKE_PORT ?? String(await freePort())
 // Unique per run: a file left behind by a killed run must not block the next one.
 const dbName = `smoke-${process.pid}.db`
 const dbPath = join(root, 'apps/server/data', dbName)
