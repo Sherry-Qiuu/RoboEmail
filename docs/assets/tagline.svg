@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 44" width="900" height="44" role="img" aria-label="RoboEmail: British academic English, not translation.">
+  <title>RoboEmail</title>
+  <style>
+    .p { opacity: 0; animation: cycle 16s infinite; }
+    .p1 { opacity: 1; animation-name: cycle-first; }
+    .p2 { animation-delay: 4s; }
+    .p3 { animation-delay: 8s; }
+    .p4 { animation-delay: 12s; }
+    .dot { animation: blink 2.6s ease-in-out infinite; }
+    @keyframes cycle {
+      0% { opacity: 0; }
+      4% { opacity: 1; }
+      23% { opacity: 1; }
+      27% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes cycle-first {
+      0% { opacity: 1; }
+      23% { opacity: 1; }
+      27% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .p { animation: none; opacity: 0; }
+      .p1 { opacity: 1; }
+      .dot { animation: none; opacity: 0.8; }
+    }
+  </style>
+
+  <g font-family="-apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#4f7a5b" letter-spacing="0.2">
+    <text class="p p1" x="450" y="28" text-anchor="middle">British academic English, not translation.</text>
+    <text class="p p2" x="450" y="28" text-anchor="middle">Draft. Polish. Learn from every edit.</text>
+    <text class="p p3" x="450" y="28" text-anchor="middle">Professor or Dr — get it right.</text>
+    <text class="p p4" x="450" y="28" text-anchor="middle">576 staff · 463 profiles · 1,420 papers.</text>
+  </g>
+</svg>

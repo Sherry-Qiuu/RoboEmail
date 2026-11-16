@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-labelledby="roboemail-banner-title roboemail-banner-desc">
+  <title id="roboemail-banner-title">RoboEmail — 写给教授的英文邮件</title>
+  <desc id="roboemail-banner-desc">A letter being written beside the RoboEmail wordmark. UNNC 英文邮件写作助手。</desc>
+
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#222220" stroke-width="1"/>
+    </pattern>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#1a1a17" flood-opacity="0.32"/>
+    </filter>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a8c9a6" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#a8c9a6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#a8c9a6" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="wordClip">
+      <text x="70" y="216" font-family="'Iowan Old Style','Palatino Linotype',Georgia,'Songti SC',serif" font-size="84" letter-spacing="-2.5">RoboEmail</text>
+    </clipPath>
+    <style>
+      .float-slow { animation: floaty 9s ease-in-out infinite; }
+      .float-fast { animation: floaty 7s ease-in-out infinite; animation-delay: -2s; }
+      .pulse { animation: pulse 8s ease-in-out infinite; }
+      .caret { animation: blink 1.15s steps(1, end) infinite; }
+      .chip-a { animation: floaty 8s ease-in-out infinite; animation-delay: -1.5s; }
+      .chip-b { animation: floaty 10s ease-in-out infinite; animation-delay: -4s; }
+      @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+      @keyframes pulse { 0%, 100% { opacity: 0.22; } 50% { opacity: 0.42; } }
+      @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .float-slow, .float-fast, .pulse, .caret, .chip-a, .chip-b { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1280" height="400" fill="#171714"/>
+  <rect width="1280" height="400" fill="url(#grid)" opacity="0.6"/>
+  <ellipse cx="1090" cy="10" rx="360" ry="200" fill="#1f2a21" class="pulse"/>
+  <ellipse cx="240" cy="420" rx="300" ry="150" fill="#1f2a21" opacity="0.35"/>
+  <rect x="0.5" y="0.5" width="1279" height="399" fill="none" stroke="#32322c"/>
+
+  <!-- Wordmark -->
+  <g>
+    <rect x="72" y="70" width="56" height="56" rx="16" fill="#a8c9a6"/>
+    <g fill="none" stroke="#1e1e1b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="86" y="86" width="28" height="22" rx="4"/>
+      <path d="M86 88 L100 98 L114 88"/>
+    </g>
+    <text x="144" y="94" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" letter-spacing="2.6" fill="#a9a9a1">UNNC · BRITISH ACADEMIC ENGLISH</text>
+    <text x="144" y="114" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="11" letter-spacing="2.6" fill="#7c7c74">写邮件 · 润色 · 教授档案 · 错题本</text>
+
+    <text x="70" y="216" font-family="'Iowan Old Style','Palatino Linotype',Georgia,'Songti SC',serif" font-size="84" letter-spacing="-2.5" fill="#f1f1ea">RoboEmail</text>
+    <g clip-path="url(#wordClip)">
+      <rect x="-320" y="148" width="260" height="96" fill="url(#sheen)">
+        <animate attributeName="x" values="-320;1400;1400" keyTimes="0;0.55;1" dur="9s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <text x="72" y="258" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="24" fill="#a9a9a1">写给教授的英文邮件，从提笔到收尾</text>
+    <text x="72" y="298" font-family="-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#7c7c74">rbem.online　·　576 位教职工　·　463 份档案　·　1420 篇论文</text>
+  </g>
+
+  <!-- Floating pills -->
+  <g class="chip-a">
+    <rect x="566" y="82" width="122" height="30" rx="15" fill="#1f2a21" stroke="#3d5640"/>
+    <text x="627" y="101" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11.5" letter-spacing="0.6" fill="#a8c9a6">Professor ≠ Dr</text>
+  </g>
+  <g class="chip-b">
+    <rect x="548" y="322" width="128" height="28" rx="14" fill="#1f2a21" stroke="#3d5640"/>
+    <text x="612" y="340" text-anchor="middle" font-family="-apple-system,'Segoe UI','PingFang SC',sans-serif" font-size="11.5" fill="#a8c9a6">不编造事实</text>
+  </g>
+
+  <!-- Letter card -->
+  <g transform="rotate(-2 940 200)">
+    <g class="float-slow">
+      <rect x="700" y="62" width="480" height="278" rx="18" fill="#1e1e1b" stroke="#32322c" filter="url(#cardShadow)"/>
+
+      <text x="728" y="98" font-family="-apple-system,'Segoe UI',sans-serif" font-size="9.5" letter-spacing="2" fill="#7c7c74">SUBJECT</text>
+      <text x="728" y="122" font-family="-apple-system,'Segoe UI','PingFang SC',sans-serif" font-size="15.5" fill="#f1f1ea">Extension request — COMP1033</text>
+      <line x1="728" y1="142" x2="1152" y2="142" stroke="#32322c"/>
+
+      <text x="728" y="170" font-family="-apple-system,'Segoe UI','PingFang SC',sans-serif" font-size="13.5" fill="#a8c9a6">Dear Professor Zhou,</text>
+      <rect class="caret" x="866" y="156" width="2" height="16" fill="#a8c9a6"/>
+
+      <g fill="#33332d">
+        <rect class="line" x="728" y="192" width="366" height="8" rx="4"/>
+        <rect class="line" x="728" y="212" width="330" height="8" rx="4"/>
+        <rect class="line" x="728" y="232" width="306" height="8" rx="4"/>
+        <rect class="line" x="728" y="252" width="224" height="8" rx="4"/>
+      </g>
+
+      <text x="728" y="292" font-family="-apple-system,'Segoe UI','PingFang SC',sans-serif" font-size="11" fill="#7c7c74">Yours sincerely,</text>
+      <text x="728" y="314" font-family="'Iowan Old Style',Georgia,'Songti SC',serif" font-size="15" fill="#a9a9a1">Shihan QIU</text>
+
+      <g>
+        <rect x="1066" y="86" width="66" height="24" rx="12" fill="#1f2a21"/>
+        <circle cx="1080" cy="98" r="3" fill="#a8c9a6">
+          <animate attributeName="opacity" values="1;0.35;1" dur="2.4s" repeatCount="indefinite"/>
+        </circle>
+        <text x="1090" y="102" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10" fill="#a8c9a6">2.1 s</text>
+      </g>
+    </g>
+  </g>
+</svg>
