@@ -193,14 +193,27 @@ export function App() {
             <span className="text-faint">（个人邮箱）</span>
           </p>
 
-          <a
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-block text-[11px] text-faint transition-colors hover:text-ink"
-          >
-            浙ICP备2026097271号
-          </a>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] text-faint transition-colors hover:text-ink"
+            >
+              浙ICP备2026097271号
+            </a>
+
+            {/* 公安联网备案要求图标在编号左侧，链接到官方查询页。 */}
+            <a
+              href="https://beian.mps.gov.cn/#/query/webSearch?code=33021202004698"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[11px] text-faint transition-colors hover:text-ink"
+            >
+              <img src="/gongan.png" alt="" width={14} height={14} className="h-[14px] w-[14px]" />
+              浙公网安备33021202004698号
+            </a>
+          </div>
         </div>
       </footer>
     </div>
