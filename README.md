@@ -345,6 +345,7 @@ node scripts/feedback.mjs --done <id> # 标记已处理
 | [`docs/handoff.md`](docs/handoff.md) | 交接：谁做了什么、哪里容易踩坑 |
 | [`docs/handoff-two-site.md`](docs/handoff-two-site.md) | 同机双站的分工与边界 |
 | [`docs/two-site-after-filing.md`](docs/two-site-after-filing.md) | 第二站点备案通过后的收尾清单 |
+| [`docs/handoff-morrow-remaining.md`](docs/handoff-morrow-remaining.md) | 第二站点上线后的合规与运维清单（给 Morrow 侧） |
 | [`docs/handoff-mailer.md`](docs/handoff-mailer.md) | 发信模块的交接说明 |
 | [`docs/video-script.md`](docs/video-script.md) | 宣传视频脚本（90 秒 + 30 秒） |
 | [`CHANGELOG.md`](CHANGELOG.md) | 版本更新日志 |
