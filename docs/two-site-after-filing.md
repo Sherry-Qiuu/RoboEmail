@@ -1,7 +1,9 @@
 # calhub.asia 备案通过后的收尾
 
 > 2026-11-13 · 前置：《[双站同机交接](handoff-two-site.md)》
-> 现状：Caddy 已加载 `calhub.asia` 块并经 reload，服务端就绪；只等备案放行。
+> 现状：**已完成。** 备案于 2026-11-18 放行，Caddy 当日 10:17 签发证书，
+> `http` 308 跳 `https`，`https://calhub.asia` 返回 200，`https://rbem.online` 未受影响。
+> 本文保留下来作为排查手册。
 
 ---
 
