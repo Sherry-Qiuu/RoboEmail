@@ -239,25 +239,26 @@
  * override written inside @layer components would silently lose. Unlayered
  * rules win against all layers, which is what these need.
  *
- * With artwork behind the page a translucent bar reads as a smudge, so each
- * theme gets a solid tone sampled from that landscape plus a matching accent.
+ * The page itself stays light and airy even with a landscape behind it, so the
+ * bar is a pale tint of each landscape rather than its deep tone: a dark slab
+ * over washed-out artwork reads as a heavy black band.
  */
-html[data-edge-image-theme='aurora'] { --app-header-bg: #12303f; --app-header-accent: #7fd4c8; }
-html[data-edge-image-theme='dune'] { --app-header-bg: #6b4a24; --app-header-accent: #f0c68c; }
-html[data-edge-image-theme='tide'] { --app-header-bg: #12394d; --app-header-accent: #7fd0e8; }
-html[data-edge-image-theme='bloom'] { --app-header-bg: #6d3a4d; --app-header-accent: #f5cdd9; }
-html[data-edge-image-theme='nocturne'] { --app-header-bg: #1b1f38; --app-header-accent: #a9b4ff; }
-html[data-edge-image-theme='alpine'] { --app-header-bg: #33506b; --app-header-accent: #d7e6f5; }
-html[data-edge-image-theme='forest'] { --app-header-bg: #23402f; --app-header-accent: #a8c9a6; }
-html[data-edge-image-theme='coast'] { --app-header-bg: #1f5a5a; --app-header-accent: #9ee0d4; }
-html[data-edge-image-theme='meadow'] { --app-header-bg: #47663a; --app-header-accent: #d8e7b3; }
-html[data-edge-image-theme='canyon'] { --app-header-bg: #8a4327; --app-header-accent: #f2c39b; }
+html[data-edge-image-theme='aurora'] { --app-header-bg: #e2f1f0; --app-header-accent: #1f6b62; }
+html[data-edge-image-theme='dune'] { --app-header-bg: #f6ecdf; --app-header-accent: #8a5a1e; }
+html[data-edge-image-theme='tide'] { --app-header-bg: #e1eef4; --app-header-accent: #1c5a73; }
+html[data-edge-image-theme='bloom'] { --app-header-bg: #f8eaef; --app-header-accent: #8d4a61; }
+html[data-edge-image-theme='nocturne'] { --app-header-bg: #e9eaf4; --app-header-accent: #3b3f6e; }
+html[data-edge-image-theme='alpine'] { --app-header-bg: #e6eff7; --app-header-accent: #2f5375; }
+html[data-edge-image-theme='forest'] { --app-header-bg: #e6f0e7; --app-header-accent: #2c5238; }
+html[data-edge-image-theme='coast'] { --app-header-bg: #e0f1ee; --app-header-accent: #1c6360; }
+html[data-edge-image-theme='meadow'] { --app-header-bg: #ecf2e1; --app-header-accent: #4a6a2f; }
+html[data-edge-image-theme='canyon'] { --app-header-bg: #f9e9df; --app-header-accent: #94422a; }
 
 html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header {
-  --app-header-ink: #f9f9f6;
-  --app-header-soft: rgba(249, 249, 246, 0.78);
-  background: var(--app-header-bg, #2c2c29);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  --app-header-ink: #22221f;
+  --app-header-soft: rgba(34, 34, 31, 0.62);
+  background: var(--app-header-bg, var(--edge-panel-bg));
+  border-bottom: 1px solid rgba(34, 34, 31, 0.1);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -279,10 +280,12 @@ html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .tex
 }
 
 html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .bg-rule {
-  background: rgba(255, 255, 255, 0.26);
+  background: rgba(34, 34, 31, 0.14);
 }
 
+/* The badge keeps its normal stamp: on a pale bar the default sage-on-paper
+   already has the contrast, and tinting it loses the mark's edge. */
 html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header svg {
-  --brand-mark-bg: rgba(255, 255, 255, 0.18);
-  --brand-mark-fg: var(--app-header-accent);
+  --brand-mark-bg: var(--app-header-accent);
+  --brand-mark-fg: #ffffff;
 }
