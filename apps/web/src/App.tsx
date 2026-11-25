@@ -216,52 +216,53 @@ export function App() {
         )}
       </main>
 
-      <footer className="mx-auto max-w-[820px] px-6 pb-10">
-        <div className="border-t border-rule pt-5 text-center">
-          <p className="text-[12px] text-muted">
+      <footer className="app-footer mx-auto max-w-[1060px] px-6">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-rule py-3 text-[11px] text-faint">
+          <span>
             Contact Us (Me)：
             <a
               href="mailto:biysq6@nottingham.edu.cn"
-              className="transition-colors hover:text-ink"
+              className="text-muted transition-colors hover:text-ink"
             >
               biysq6@nottingham.edu.cn
             </a>
-            <span className="text-faint">（学校邮箱）</span>
-            <span className="mx-2 text-faint">/</span>
-            <a href="mailto:19558222390@163.com" className="transition-colors hover:text-ink">
+            <span className="mx-1">/</span>
+            <a
+              href="mailto:19558222390@163.com"
+              className="text-muted transition-colors hover:text-ink"
+            >
               19558222390@163.com
             </a>
-            <span className="text-faint">（个人邮箱）</span>
-          </p>
+          </span>
 
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <a
-              href="https://beian.miit.gov.cn/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-[11px] text-faint transition-colors hover:text-ink"
-            >
-              浙ICP备2026097271号
-            </a>
+          <span className="text-rule">|</span>
 
-            {/* 公安联网备案要求图标在编号左侧，链接到官方查询页。 */}
-            <a
-              href="https://beian.mps.gov.cn/#/query/webSearch?code=33021202004698"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] text-faint transition-colors hover:text-ink"
-            >
-              <img src="/gongan.png" alt="" width={14} height={14} className="h-[14px] w-[14px]" />
-              浙公网安备33021202004698号
-            </a>
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-colors hover:text-ink"
+          >
+            浙ICP备2026097271号
+          </a>
 
-            <button
-              className="text-[11px] text-faint transition-colors hover:text-ink"
-              onClick={() => openFeedback({ page: 'footer' })}
-            >
-              反馈
-            </button>
-          </div>
+          {/* 公安联网备案要求图标在编号左侧，链接到官方查询页。 */}
+          <a
+            href="https://beian.mps.gov.cn/#/query/webSearch?code=33021202004698"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 transition-colors hover:text-ink"
+          >
+            <img src="/gongan.png" alt="" width={13} height={13} className="h-[13px] w-[13px]" />
+            浙公网安备33021202004698号
+          </a>
+
+          <button
+            className="transition-colors hover:text-ink"
+            onClick={() => openFeedback({ page: 'footer' })}
+          >
+            反馈
+          </button>
         </div>
       </footer>
     </div>

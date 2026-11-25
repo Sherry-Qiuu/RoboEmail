@@ -175,7 +175,9 @@ export function MyPage() {
   }
 
   useEffect(() => {
-    refresh().finally(() => setReady(true))
+    refresh()
+      .catch(() => undefined)
+      .finally(() => setReady(true))
   }, [])
 
   async function remove(id: string) {
