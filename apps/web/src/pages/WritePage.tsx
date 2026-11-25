@@ -202,8 +202,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
 
   return (
     <section>
-      <div className="flex items-baseline justify-between gap-4">
-        <h1 className="font-display text-[32px] leading-none tracking-tight">写邮件</h1>
+      <div className="flex items-baseline justify-end gap-4">
         <button
           className="text-[12px] text-faint transition-colors hover:text-ink"
           onClick={reset}
@@ -212,7 +211,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
         </button>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         {PURPOSES.map((item) => {
           const active = purposes.includes(item.id)
           return (

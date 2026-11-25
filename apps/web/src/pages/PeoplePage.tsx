@@ -35,7 +35,6 @@ function shortSchool(school: string): string {
 function Gate({ note, action, onAction, busy }: GateProps) {
   return (
     <section>
-      <h1 className="font-display text-[32px] leading-none tracking-tight">教授</h1>
       <p className="mt-4 max-w-[420px] text-[14px] text-muted">{note}</p>
       <button className="btn btn-primary mt-8" onClick={onAction} disabled={busy}>
         {busy ? '开启中…' : action}
@@ -118,7 +117,6 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
   if (loading) {
     return (
       <section>
-        <h1 className="font-display text-[32px] leading-none tracking-tight">教授</h1>
         <p className="mt-6 text-[13px] text-faint">读取中…</p>
       </section>
     )
@@ -130,7 +128,6 @@ export function PeoplePage({ signedIn, isUnnc, onNeedAccount, onEnabled, onWrite
   return (
     <section>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h1 className="font-display text-[32px] leading-none tracking-tight">教授</h1>
         <span className="text-[12px] text-faint">
           收录 {items.length} 人
           {updated && ` · 更新于 ${updated}`}

@@ -138,7 +138,9 @@ export function App() {
         </div>
       </header>
 
-      <main className={`mx-auto max-w-[820px] px-6 ${locked ? 'history-main' : 'py-14'}`}>
+      <main
+        className={`mx-auto max-w-[1080px] px-5 ${locked ? 'history-main' : 'pb-16 pt-7'}`}
+      >
         {checking ? (
           <p className="text-[13px] text-faint">读取中…</p>
         ) : resetToken ? (
@@ -216,7 +218,7 @@ export function App() {
         )}
       </main>
 
-      <footer className="app-footer mx-auto max-w-[1060px] px-6">
+      <footer className="app-footer mx-auto max-w-[1080px] px-5">
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-rule py-3 text-[11px] text-faint">
           <span>
             Contact Us (Me)：

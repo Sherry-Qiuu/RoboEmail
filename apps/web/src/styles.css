@@ -314,8 +314,8 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  /* Wide enough for a 286 px rail plus a readable letter column. */
-  max-width: 1060px;
+  /* A column flex item with auto margins shrinks to its content otherwise. */
+  width: 100%;
 }
 
 .app-shell--locked footer {

@@ -47,9 +47,7 @@ export function SettingsPage({ user, onLoggedOut }: Props) {
 
   return (
     <section>
-      <h1 className="font-display text-[32px] leading-none tracking-tight">设置</h1>
-
-      <div className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[13px]">
+      <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[13px]">
         <span className="text-muted">{user.username}</span>
         <span className="text-faint">{user.email}</span>
         {user.isUnnc && <span className="text-faint">UNNC</span>}

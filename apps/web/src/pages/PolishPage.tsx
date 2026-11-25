@@ -204,10 +204,7 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
 
   return (
     <section>
-      <h1 className="font-display text-[32px] leading-none tracking-tight">润色</h1>
-      <p className="mt-3 text-[14px] text-muted">贴一段英文草稿，拿到改过的版本和逐条理由。</p>
-
-      <div className="mt-9">
+      <div className="mt-1">
         <div className="flex items-baseline justify-between">
           <span className="label">原文</span>
           <VoiceButton lang="en-US" onText={(said) => setText((current) => `${current}${said}`)} />

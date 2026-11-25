@@ -43,7 +43,6 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
   if (!signedIn) {
     return (
       <section>
-        <h1 className="font-display text-[32px] leading-none tracking-tight">学习</h1>
         <p className="mt-4 max-w-[420px] text-[14px] text-muted">
           登录后，每次润色改掉的错误会记在这里，按类别归档。
         </p>
@@ -57,7 +56,6 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
   if (loading) {
     return (
       <section>
-        <h1 className="font-display text-[32px] leading-none tracking-tight">学习</h1>
         <p className="mt-6 text-[13px] text-faint">读取中…</p>
       </section>
     )
@@ -66,7 +64,6 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
   if (error) {
     return (
       <section>
-        <h1 className="font-display text-[32px] leading-none tracking-tight">学习</h1>
         <p className="mt-6 text-[13px] text-warn">{error}</p>
       </section>
     )
@@ -75,7 +72,6 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
   if (!data || data.total === 0) {
     return (
       <section>
-        <h1 className="font-display text-[32px] leading-none tracking-tight">学习</h1>
         <p className="mt-6 border-t border-rule pt-6 text-[13px] text-faint">
           还没有记录。润色一封邮件，改掉的错误会自动进这里。
         </p>
@@ -88,9 +84,7 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
 
   return (
     <section>
-      <h1 className="font-display text-[32px] leading-none tracking-tight">学习</h1>
-
-      <div className="mt-10 grid gap-10 sm:grid-cols-[140px_1fr]">
+      <div className="grid gap-10 sm:grid-cols-[140px_1fr]">
         <div>
           <span className="label">累计</span>
           <p className="font-display text-[44px] leading-none tracking-tight">{data.total}</p>
