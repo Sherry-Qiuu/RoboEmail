@@ -70,7 +70,7 @@ export function App() {
   return (
     <div className={`app-shell min-h-screen ${locked ? 'app-shell--locked' : ''}`}>
       <header className="app-header" ref={headerRef}>
-        <div className="app-bar mx-auto max-w-[820px] px-6">
+        <div className="app-bar mx-auto max-w-[1080px] px-5">
           <div className="app-bar-top">
             <button
               onClick={() => setView('write')}
