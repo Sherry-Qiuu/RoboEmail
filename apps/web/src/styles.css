@@ -15,6 +15,16 @@
   --brand-mark-fg: #f3f3f1;
 }
 
+/*
+ * No rubber-band at the ends. Without this, a trackpad or touch screen drags the
+ * page past its last pixel and springs back; the document simply stops instead.
+ * The inner panes also stop chaining their scroll to the page.
+ */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 [data-edge-mode='dark'] {
   --brand-mark-bg: #f3f3f1;
   --brand-mark-fg: #191917;
@@ -372,6 +382,7 @@
 .history-pane {
   scrollbar-width: thin;
   scrollbar-color: var(--edge-border-strong, #d0d0c8) transparent;
+  overscroll-behavior: contain;
 }
 
 .history-daylist ul::-webkit-scrollbar,
