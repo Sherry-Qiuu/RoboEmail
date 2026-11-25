@@ -327,15 +327,16 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding-top: 22px;
-  padding-bottom: 10px;
+  padding-top: 16px;
+  padding-bottom: 8px;
 }
 
+/* Just the tools now; the page title was removed to give the panes the room. */
 .history-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+  gap: 12px;
+  flex: none;
 }
 
 .history-panes {
@@ -344,7 +345,7 @@
   display: grid;
   grid-template-columns: 286px minmax(0, 1fr);
   gap: 44px;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .history-rail {

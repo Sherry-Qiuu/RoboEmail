@@ -171,7 +171,13 @@ export function MyPage() {
   }, [popOpen])
 
   async function refresh() {
-    setItems(await history.list())
+    // A stuck IndexedDB open would otherwise leave the page on "读取中…" for
+    // ever; four seconds is far longer than this local read should take.
+    const rows = await Promise.race([
+      history.list(),
+      new Promise<HistoryEntry[]>((resolve) => window.setTimeout(() => resolve([]), 4000)),
+    ])
+    setItems(rows)
   }
 
   useEffect(() => {
@@ -252,9 +258,7 @@ export function MyPage() {
   return (
     <section className="history-page">
       <div className="history-head">
-        <h1 className="font-display text-[32px] leading-none tracking-tight">历史记录</h1>
-
-        <div className="flex flex-wrap items-center justify-end gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="relative" ref={menu}>
             <button
               className="btn btn-ghost"
