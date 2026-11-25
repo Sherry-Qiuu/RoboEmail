@@ -195,6 +195,22 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  /** Back to a blank page: text, direction, result and the saved draft. */
+  function reset() {
+    const hasContent = Boolean(text.trim() || direction.trim() || tags.length > 0 || data)
+    if (hasContent && !window.confirm('清空这一页填写的内容？')) return
+    setText('')
+    setDirection('')
+    setTags([])
+    setData(null)
+    setCopied(false)
+    setError('')
+    // A fresh page must not keep writing into the letter it was opened from.
+    setChainSource('')
+    writeDraft('polish', { text: '', direction: '', tags: [] })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   async function copy() {
     if (!data) return
     await navigator.clipboard.writeText(data.result.revised)
@@ -204,7 +220,16 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
 
   return (
     <section>
-      <div className="mt-1">
+      <div className="flex items-baseline justify-end">
+        <button
+          className="text-[12px] text-faint transition-colors hover:text-ink"
+          onClick={reset}
+        >
+          清空
+        </button>
+      </div>
+
+      <div className="mt-3">
         <div className="flex items-baseline justify-between">
           <span className="label">原文</span>
           <VoiceButton lang="en-US" onText={(said) => setText((current) => `${current}${said}`)} />
