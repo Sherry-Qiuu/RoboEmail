@@ -88,6 +88,12 @@ function DirectionPicker({ tags, onToggle, direction, setDirection, disabled }: 
 }
 
 export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
+  /**
+   * What the next save points at. It starts at whatever opened this page, then
+   * follows each result, so 润色 → 继续改 → 润色 forms one chain instead of two
+   * siblings hanging off the original letter.
+   */
+  const [chainSource, setChainSource] = useState(sourceId ?? '')
   const [text, setText] = useState(
     () => preset || readDraft<{ text: string }>('polish')?.text || '',
   )
@@ -146,14 +152,15 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
         instruction: buildInstruction(),
       })
       setData(response)
-      await remember({
+      const entryId = await remember({
         mode: 'polish',
         title: summaryLine(response.result.revised, '润色'),
         text: response.result.revised,
         meta: `${response.result.changes.length} 处改动`,
         payload: response,
-        parentId: sourceId,
+        parentId: chainSource || undefined,
       })
+      if (entryId) setChainSource(entryId)
 
       if (response.result.errors.length > 0) {
         void api

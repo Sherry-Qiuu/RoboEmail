@@ -84,6 +84,15 @@ const cases: { name: string; rows: Row[]; expect: number[] }[] = [
     ],
     expect: [3],
   },
+  {
+    name: 'polish -> continue -> polish stays one chain',
+    rows: [
+      { id: 'e1', text: oxford, createdAt: 1 },
+      { id: 'e2', text: oxfordEdited, createdAt: 2, parentId: 'e1' },
+      { id: 'e3', text: oxfordEdited, createdAt: 3, parentId: 'e2' },
+    ],
+    expect: [3],
+  },
 ]
 
 let failed = 0
