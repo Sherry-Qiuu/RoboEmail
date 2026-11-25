@@ -34,6 +34,8 @@ const QUICK = [
 type Props = {
   onNeedAccount: () => void
   preset?: string
+  /** Entry this run came from, so the history can group the chain. */
+  sourceId?: string
 }
 
 type PickerProps = {
@@ -85,7 +87,7 @@ function DirectionPicker({ tags, onToggle, direction, setDirection, disabled }: 
   )
 }
 
-export function PolishPage({ onNeedAccount, preset = '' }: Props) {
+export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
   const [text, setText] = useState(
     () => preset || readDraft<{ text: string }>('polish')?.text || '',
   )
@@ -146,12 +148,13 @@ export function PolishPage({ onNeedAccount, preset = '' }: Props) {
         instruction: buildInstruction(),
       })
       setData(response)
-      remember({
+      await remember({
         mode: 'polish',
         title: summaryLine(response.result.revised, '润色'),
         text: response.result.revised,
         meta: `${response.result.changes.length} 处改动`,
         payload: response,
+        parentId: sourceId,
       })
 
       if (response.result.errors.length > 0) {

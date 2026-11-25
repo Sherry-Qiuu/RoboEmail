@@ -22,6 +22,7 @@ export function App() {
   const [checking, setChecking] = useState(true)
   const [view, setView] = useState<View>('write')
   const [polishSeed, setPolishSeed] = useState('')
+  const [polishSource, setPolishSource] = useState('')
   const [writeSeed, setWriteSeed] = useState<Professor | null>(null)
   const [resetToken, setResetToken] = useState(() => {
     if (!window.location.pathname.startsWith('/reset')) return ''
@@ -73,6 +74,7 @@ export function App() {
                   className={navClass(view === 'polish')}
                   onClick={() => {
                     setPolishSeed('')
+                    setPolishSource('')
                     setView('polish')
                   }}
                 >
@@ -123,8 +125,9 @@ export function App() {
           <>
         {view === 'polish' && (
           <PolishPage
-            key={polishSeed}
+            key={polishSource || polishSeed}
             preset={polishSeed}
+            sourceId={polishSource || undefined}
             onNeedAccount={() => setView('auth')}
           />
         )}
@@ -133,8 +136,9 @@ export function App() {
             key={writeSeed?.id ?? 'blank'}
             seed={writeSeed}
             onNeedAccount={() => setView('auth')}
-            onPolish={(text) => {
+            onPolish={(text, sourceId) => {
               setPolishSeed(text)
+              setPolishSource(sourceId ?? '')
               setView('polish')
             }}
           />

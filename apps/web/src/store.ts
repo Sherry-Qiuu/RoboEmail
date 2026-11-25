@@ -9,6 +9,8 @@ export type HistoryEntry = {
   meta: string
   createdAt: number
   payload: unknown
+  /** The entry this one was derived from, so a letter and its rewrites group. */
+  parentId?: string
 }
 
 let opening: Promise<IDBDatabase> | null = null
@@ -49,10 +51,11 @@ export const history = {
     return rows.sort((a, b) => b.createdAt - a.createdAt)
   },
 
-  add(entry: Omit<HistoryEntry, 'id' | 'createdAt'>): Promise<IDBValidKey> {
-    return run('readwrite', (store) =>
-      store.put({ ...entry, id: crypto.randomUUID(), createdAt: Date.now() }),
-    )
+  /** Returns the id of the row it wrote, so callers can chain entries. */
+  async add(entry: Omit<HistoryEntry, 'id' | 'createdAt'>): Promise<string> {
+    const id = crypto.randomUUID()
+    await run('readwrite', (store) => store.put({ ...entry, id, createdAt: Date.now() }))
+    return id
   },
 
   /** Used by import, where the original id and timestamp must survive. */
@@ -69,8 +72,14 @@ export const history = {
   },
 }
 
-export function remember(entry: Omit<HistoryEntry, 'id' | 'createdAt'>): void {
-  void history.add(entry).catch(() => undefined)
+export async function remember(
+  entry: Omit<HistoryEntry, 'id' | 'createdAt'>,
+): Promise<string | undefined> {
+  try {
+    return await history.add(entry)
+  } catch {
+    return undefined
+  }
 }
 
 export { summaryLine } from './summary.ts'

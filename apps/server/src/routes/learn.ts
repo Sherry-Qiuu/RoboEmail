@@ -81,7 +81,10 @@ learn.get('/insights', requireAuth, (c) => {
     )
     .all(user.id) as { category: string; n: number }[]
 
-  const since = new Date(Date.now() - 6 * 86_400_000).toISOString().slice(0, 10)
+  // A year of days for the activity heatmap. 371 = 53 weeks, which is what the
+  // grid needs to end on today's weekday without a ragged last column.
+  const WINDOW = 371
+  const since = new Date(Date.now() - (WINDOW - 1) * 86_400_000).toISOString().slice(0, 10)
   const rows = db
     .prepare(
       'SELECT substr(created_at, 1, 10) AS day, COUNT(*) AS n FROM errors WHERE user_id = ? AND created_at >= ? GROUP BY day',
@@ -89,8 +92,8 @@ learn.get('/insights', requireAuth, (c) => {
     .all(user.id, since) as { day: string; n: number }[]
 
   const counts = new Map(rows.map((row) => [row.day, row.n]))
-  const daily = Array.from({ length: 7 }, (_unused, index) => {
-    const day = new Date(Date.now() - (6 - index) * 86_400_000).toISOString().slice(0, 10)
+  const daily = Array.from({ length: WINDOW }, (_unused, index) => {
+    const day = new Date(Date.now() - (WINDOW - 1 - index) * 86_400_000).toISOString().slice(0, 10)
     return { day, n: counts.get(day) ?? 0 }
   })
 

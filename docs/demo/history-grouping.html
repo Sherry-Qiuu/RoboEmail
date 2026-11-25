@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>历史记录分组 · 演示</title>
+<style>
+  :root {
+    --paper: #f3f3f1;
+    --surface: #ffffff;
+    --ink: #191917;
+    --muted: #6f6f68;
+    --faint: #9b9b93;
+    --rule: #e6e4dc;
+    --accent: #4f7a5b;
+    --accent-soft: #edf2ee;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 500px at 70% -10%, #e7eef2 0%, transparent 60%),
+      var(--paper);
+    color: var(--ink);
+    font: 14px/1.6 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .demo-badge {
+    position: fixed; right: 16px; top: 16px; z-index: 50;
+    background: #191917; color: #f7f7f4; font-size: 11px; letter-spacing: .08em;
+    padding: 5px 10px; border-radius: 6px;
+  }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    border-bottom: 1px solid var(--rule);
+    background: rgba(251,251,249,.92);
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+  .bar {
+    max-width: 860px; margin: 0 auto; height: 60px; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: Georgia, "Songti SC", serif; font-size: 19px; }
+  .mark {
+    width: 26px; height: 26px; border-radius: 7px; background: var(--accent);
+    color: #fff; display: grid; place-items: center; font-size: 14px; font-family: Georgia, serif;
+  }
+  nav { display: flex; gap: 20px; font-size: 13px; color: var(--muted); }
+  nav b { color: var(--ink); font-weight: 400; }
+  main { max-width: 860px; margin: 0 auto; padding: 44px 24px 120px; }
+  h1 { font-family: Georgia, "Songti SC", serif; font-size: 30px; font-weight: 400; margin: 0; letter-spacing: -.01em; }
+  .tools { display: flex; gap: 10px; margin-top: 20px; }
+  .btn {
+    border: 1px solid var(--rule); background: transparent; color: var(--muted);
+    border-radius: 8px; min-height: 34px; padding: 0 14px; font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:hover { border-color: #d0d0c8; color: var(--ink); background: #f0f0ec; }
+
+  /* ---------- thread ---------- */
+  .thread { border-top: 1px solid var(--rule); }
+  .thread:first-of-type { margin-top: 28px; }
+  .thread-head {
+    width: 100%; display: flex; gap: 12px; align-items: flex-start;
+    background: none; border: 0; padding: 16px 4px; text-align: left; cursor: pointer;
+    font-family: inherit; color: inherit;
+  }
+  .thread-head:hover .thread-title { color: var(--accent); }
+  .caret {
+    width: 16px; flex: none; margin-top: 3px; color: var(--faint);
+    transition: transform .15s ease; font-size: 11px;
+  }
+  .thread[data-open="true"] > .thread-head .caret { transform: rotate(90deg); }
+  .thread-main { min-width: 0; flex: 1; }
+  .thread-meta { font-size: 12px; color: var(--faint); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .pill {
+    display: inline-block; padding: 1px 7px; border-radius: 999px;
+    background: var(--accent-soft); color: #3f6549; font-size: 11px;
+  }
+  .thread-title {
+    margin-top: 3px; font-size: 15px; color: var(--ink);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .thread-actions { flex: none; display: flex; gap: 12px; font-size: 12px; color: var(--muted); }
+  .thread-actions span { cursor: pointer; }
+  .thread-actions span:hover { color: var(--ink); }
+
+  /* ---------- versions ---------- */
+  .versions { display: none; padding: 0 0 18px 28px; }
+  .thread[data-open="true"] > .versions { display: block; }
+  .version { border-left: 2px solid var(--rule); padding-left: 16px; position: relative; }
+  .version + .version { margin-top: 2px; }
+  .version::before {
+    content: ""; position: absolute; left: -6px; top: 16px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--rule);
+  }
+  .version[data-latest="true"]::before { border-color: var(--accent); background: var(--accent-soft); }
+  .version-head {
+    width: 100%; display: flex; gap: 10px; align-items: baseline; justify-content: space-between;
+    background: none; border: 0; padding: 9px 0; cursor: pointer; text-align: left;
+    font-family: inherit; color: inherit;
+  }
+  .version-head:hover .v-label { color: var(--accent); }
+  .v-left { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+  .v-caret { color: var(--faint); font-size: 10px; width: 12px; flex: none; }
+  .v-label { font-size: 13px; transition: color .15s ease; }
+  .v-meta { font-size: 12px; color: var(--faint); white-space: nowrap; }
+  .v-actions { display: flex; gap: 10px; font-size: 12px; color: var(--muted); flex: none; }
+  .v-actions span:hover { color: var(--ink); cursor: pointer; }
+  .version-body { display: none; padding: 4px 0 16px; }
+  .version[data-open="true"] .version-body { display: block; }
+  .letter {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.75;
+    color: #23231f;
+  }
+  .note { margin-top: 20px; font-size: 12px; color: var(--faint); line-height: 1.9; }
+  .note b { color: var(--muted); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="demo-badge">演示模型 · 未上线</div>
+
+  <header>
+    <div class="bar">
+      <div class="brand"><span class="mark">R</span>RoboEmail</div>
+      <nav>
+        <span>写邮件</span><span>润色</span><span>教授</span><b>历史记录</b><span>学习</span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>历史记录</h1>
+
+    <div class="tools">
+      <button class="btn">导出 ▾</button>
+      <button class="btn">导入</button>
+      <button class="btn">清空</button>
+    </div>
+
+    <!-- thread 1 -->
+    <div class="thread" data-open="true">
+      <button class="thread-head" onclick="toggleThread(this)">
+        <span class="caret">▶</span>
+        <span class="thread-main">
+          <span class="thread-meta">
+            <span>11/25 18:40 – 19:03</span>
+            <span class="pill">4 个版本</span>
+          </span>
+          <span class="thread-title">Thank you for the Oxford exchange information</span>
+        </span>
+        <span class="thread-actions">
+          <span>复制最新</span><span>删除整封</span>
+        </span>
+      </button>
+
+      <div class="versions">
+        <div class="version">
+          <button class="version-head" onclick="toggleVersion(this)">
+            <span class="v-left">
+              <span class="v-caret">▶</span>
+              <span class="v-label">原始 · 写邮件</span>
+              <span class="v-meta">18:40 · 2 段</span>
+            </span>
+            <span class="v-actions"><span>复制</span><span>删除</span></span>
+          </button>
+          <div class="version-body">
+            <div class="letter">Dear Mia,
+
+Thank you for your reply and for pointing me to Yiwen ZHANG at the Oxford International Office. I will scan the WeChat QR code and contact her with my questions about the exchange programme.
+
+I am also grateful for your help with my original query about the information session. I understand that no recording or follow-up materials were mentioned, and I appreciate your guidance.
+
+Best regards,
+Shihan</div>
+          </div>
+        </div>
+
+        <div class="version">
+          <button class="version-head" onclick="toggleVersion(this)">
+            <span class="v-left">
+              <span class="v-caret">▶</span>
+              <span class="v-label">润色</span>
+              <span class="v-meta">18:47 · 2 处改动</span>
+            </span>
+            <span class="v-actions"><span>复制</span><span>删除</span></span>
+          </button>
+          <div class="version-body">
+            <div class="letter">Dear Mia,
+
+Thank you for your reply, and for pointing me to Yiwen ZHANG at the Oxford International Office. I will scan the WeChat QR code and contact her about the exchange programme.
+
+I also understand that no recording or follow-up materials were mentioned for the information session.
+
+Best regards,
+Shihan</div>
+          </div>
+        </div>
+
+        <div class="version" data-latest="true">
+          <button class="version-head" onclick="toggleVersion(this)">
+            <span class="v-left">
+              <span class="v-caret">▶</span>
+              <span class="v-label">润色 · 当前</span>
+              <span class="v-meta">19:03 · 0 处改动</span>
+            </span>
+            <span class="v-actions"><span>复制</span><span>删除</span></span>
+          </button>
+          <div class="version-body">
+            <div class="letter">Dear Mia,
+
+Thank you for your reply, and for pointing me to Yiwen ZHANG at the Oxford International Office. I will scan the WeChat QR code and contact her about the exchange programme.
+
+I also understand that no recording or follow-up materials were mentioned for the information session.
+
+Best regards,
+Shihan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- thread 2 -->
+    <div class="thread">
+      <button class="thread-head" onclick="toggleThread(this)">
+        <span class="caret">▶</span>
+        <span class="thread-main">
+          <span class="thread-meta">
+            <span>11/25 17:12 – 17:30</span>
+            <span class="pill">2 个版本</span>
+          </span>
+          <span class="thread-title">Extension request for COMP1033 coursework</span>
+        </span>
+        <span class="thread-actions"><span>复制最新</span><span>删除整封</span></span>
+      </button>
+      <div class="versions">
+        <div class="version">
+          <button class="version-head" onclick="toggleVersion(this)">
+            <span class="v-left">
+              <span class="v-caret">▶</span>
+              <span class="v-label">原始 · 写邮件</span>
+              <span class="v-meta">17:12 · 3 段</span>
+            </span>
+            <span class="v-actions"><span>复制</span><span>删除</span></span>
+          </button>
+          <div class="version-body">
+            <div class="letter">Dear Dr Smith,
+
+I am writing to ask for a short extension on the COMP1033 coursework, currently due on 28 November.
+
+I have been unwell for the past week and have documentation from the health centre.
+
+Would it be possible to submit by 5 December instead?
+
+Best regards,
+Shihan</div>
+          </div>
+        </div>
+        <div class="version" data-latest="true">
+          <button class="version-head" onclick="toggleVersion(this)">
+            <span class="v-left">
+              <span class="v-caret">▶</span>
+              <span class="v-label">润色 · 当前</span>
+              <span class="v-meta">17:30 · 3 处改动</span>
+            </span>
+            <span class="v-actions"><span>复制</span><span>删除</span></span>
+          </button>
+          <div class="version-body">
+            <div class="letter">Dear Dr Smith,
+
+I would like to request a short extension to the COMP1033 coursework, currently due on 28 November.
+
+I have been unwell for the past week and can provide documentation from the health centre.
+
+Would it be possible to submit by 5 December instead?
+
+Best regards,
+Shihan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- single entry, no children -->
+    <div class="thread">
+      <button class="thread-head" onclick="toggleThread(this)">
+        <span class="caret">▶</span>
+        <span class="thread-main">
+          <span class="thread-meta"><span>11/24 20:03</span></span>
+          <span class="thread-title">RWAC attendance not recorded due to QR code issue</span>
+        </span>
+        <span class="thread-actions"><span>复制</span><span>删除</span></span>
+      </button>
+      <div class="versions">
+        <div class="version" data-latest="true">
+          <button class="version-head" onclick="toggleVersion(this)">
+            <span class="v-left">
+              <span class="v-caret">▶</span>
+              <span class="v-label">写邮件</span>
+              <span class="v-meta">20:03 · 3 段</span>
+            </span>
+            <span class="v-actions"><span>复制</span><span>删除</span></span>
+          </button>
+          <div class="version-body">
+            <div class="letter">Dear RWAC Office,
+
+My attendance for the 20 November session was not recorded because the QR code would not scan on my phone.
+
+I tried several times during the session and took a screenshot of the error.
+
+Could you please add my attendance manually? My student ID is on the attached screenshot.
+
+Best regards,
+Shihan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>说明</b>：这一页是演示，数据是假的。三个分组分别展示「一封邮件 + 多次润色」「一封 + 一次润色」「单条无后续」三种情况。<br />
+      点击分组标题展开版本列表，点击某个版本展开信件全文。默认收起，只有第一组是展开状态。
+    </div>
+  </main>
+
+<script>
+  function toggleThread(button) {
+    const thread = button.parentElement
+    thread.dataset.open = thread.dataset.open === 'true' ? 'false' : 'true'
+  }
+  function toggleVersion(button) {
+    const version = button.parentElement
+    version.dataset.open = version.dataset.open === 'true' ? 'false' : 'true'
+    const caret = button.querySelector('.v-caret')
+    if (caret) caret.style.transform = version.dataset.open === 'true' ? 'rotate(90deg)' : ''
+  }
+</script>
+</body>
+</html>

@@ -42,7 +42,7 @@ const EMPTY: GenerateFields = {
 
 type Props = {
   onNeedAccount: () => void
-  onPolish: (text: string) => void
+  onPolish: (text: string, sourceId?: string) => void
   seed?: Professor | null
 }
 
@@ -75,6 +75,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
   const [subjectIndex, setSubjectIndex] = useState(0)
   const [slotValues, setSlotValues] = useState<Record<string, string>>({})
   const [copied, setCopied] = useState('')
+  const [entryId, setEntryId] = useState('')
   const [matches, setMatches] = useState<Professor[]>([])
   const [picking, setPicking] = useState(false)
   const [salutation, setSalutation] = useState(seed?.salutation ?? restored?.salutation ?? '')
@@ -142,13 +143,14 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
       setData(response)
       setSubjectIndex(0)
       setSlotValues({})
-      remember({
+      const entryId = await remember({
         mode: 'generate',
         title: summaryLine(response.result.subject_options[0] ?? '', '写邮件'),
         text: fillSlots(composeBody(response.result), {}),
         meta: `${response.result.paragraphs.length} 段`,
         payload: response,
       })
+      setEntryId(entryId ?? '')
     } catch (cause) {
       // A dropped session sends the user back to sign-in instead of an error.
       if (isUnauthorized(cause)) {
@@ -458,7 +460,7 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
             </button>
             <button
               className="btn btn-ghost"
-              onClick={() => onPolish(fillSlots(bodyText, slotValues))}
+              onClick={() => onPolish(fillSlots(bodyText, slotValues), entryId || undefined)}
             >
               继续润色
             </button>

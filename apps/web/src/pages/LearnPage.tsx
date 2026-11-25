@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, categoryLabel, type Insights, type LearnItem } from '../api'
+import { ActivityHeatmap } from '../components/ActivityHeatmap'
 
 type Props = {
   signedIn: boolean
@@ -82,7 +83,6 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
     )
   }
 
-  const peak = Math.max(1, ...data.daily.map((day) => day.n))
   const top = Math.max(1, ...data.byCategory.map((row) => row.n))
   const items = filter ? data.items.filter((item) => item.category === filter) : data.items
 
@@ -98,24 +98,7 @@ export function LearnPage({ signedIn, onNeedAccount }: Props) {
         </div>
 
         <div>
-          <span className="label">近 7 天</span>
-          <div className="mt-3 flex h-24 items-end gap-2">
-            {data.daily.map((day) => (
-              <div
-                key={day.day}
-                className="flex-1 rounded-[1px] bg-accent-soft"
-                style={{ height: `${Math.max((day.n / peak) * 100, day.n > 0 ? 8 : 2)}%` }}
-                title={`${day.day} · ${day.n}`}
-              />
-            ))}
-          </div>
-          <div className="mt-2 flex gap-2">
-            {data.daily.map((day) => (
-              <span key={day.day} className="flex-1 text-center text-[10px] text-faint">
-                {day.day.slice(8)}
-              </span>
-            ))}
-          </div>
+          <ActivityHeatmap days={data.daily} />
         </div>
       </div>
 
