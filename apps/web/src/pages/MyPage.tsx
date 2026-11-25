@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { exportHtml, exportJson, exportPdf, exportWord } from '../export'
 import { history, summaryLine, type HistoryEntry } from '../store'
+import { groupThreads, type Thread } from '../threads'
 
 /**
  * Generated mail stores the subject line, which reads well on its own. Polished
@@ -27,50 +28,6 @@ function dayKey(value: number): string {
 
 function todayKey(): string {
   return dayKey(Date.now())
-}
-
-type Thread = {
-  root: string
-  /** Oldest first: the original letter, then each rewrite. */
-  versions: HistoryEntry[]
-}
-
-/**
- * A generated letter and every rewrite that came from it belong together.
- * Entries carry the id they were derived from; walking that chain gives the
- * thread they belong to. Entries saved before this existed have no parent and
- * each land in a thread of their own.
- */
-function groupThreads(items: HistoryEntry[]): Thread[] {
-  const byId = new Map(items.map((entry) => [entry.id, entry]))
-
-  function rootOf(entry: HistoryEntry): string {
-    let current = entry
-    const seen = new Set<string>([current.id])
-    while (current.parentId && byId.has(current.parentId) && !seen.has(current.parentId)) {
-      current = byId.get(current.parentId)!
-      seen.add(current.id)
-    }
-    return current.id
-  }
-
-  const groups = new Map<string, HistoryEntry[]>()
-  for (const entry of items) {
-    const root = rootOf(entry)
-    const list = groups.get(root) ?? []
-    list.push(entry)
-    groups.set(root, list)
-  }
-
-  return [...groups.entries()]
-    .map(([root, versions]) => ({
-      root,
-      versions: versions.sort((a, b) => a.createdAt - b.createdAt),
-    }))
-    .sort(
-      (a, b) =>
-        b.versions[b.versions.length - 1]!.createdAt - a.versions[a.versions.length - 1]!.createdAt,
-    )
 }
 
 type DayEntry = {

@@ -16,6 +16,7 @@
     "test:export": "node scripts/export-check.ts",
     "test:calendar": "node scripts/calendar-check.ts",
     "test:summary": "node scripts/summary-check.ts",
+    "test:thread": "node scripts/thread-check.ts",
     "verify:live": "node scripts/verify-live.mjs",
     "professors": "node scripts/import_professors.mjs"
   }
