@@ -352,6 +352,53 @@
   flex: none;
 }
 
+/* The plain ghost buttons all but vanish over artwork, so the toolbar carries a
+   faint surface of its own. */
+.history-head .btn {
+  border-color: var(--edge-border-strong, #d0d0c8);
+  background: color-mix(in srgb, var(--edge-surface, #ffffff) 72%, transparent);
+  color: var(--edge-text-2, #4a4a45);
+  backdrop-filter: blur(6px);
+}
+
+.history-head .btn:hover:not(:disabled) {
+  border-color: var(--edge-accent, #4f7a5b);
+  background: var(--edge-surface, #ffffff);
+  color: var(--edge-text, #191917);
+}
+
+/* A thin, quiet scrollbar for the two scrolling panes. */
+.history-daylist ul,
+.history-pane {
+  scrollbar-width: thin;
+  scrollbar-color: var(--edge-border-strong, #d0d0c8) transparent;
+}
+
+.history-daylist ul::-webkit-scrollbar,
+.history-pane::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.history-daylist ul::-webkit-scrollbar-track,
+.history-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-daylist ul::-webkit-scrollbar-thumb,
+.history-pane::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--edge-text, #191917) 18%, transparent);
+  background-clip: content-box;
+}
+
+.history-daylist ul::-webkit-scrollbar-thumb:hover,
+.history-pane::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--edge-text, #191917) 32%, transparent);
+  background-clip: content-box;
+}
+
 .history-panes {
   flex: 1;
   min-height: 0;
