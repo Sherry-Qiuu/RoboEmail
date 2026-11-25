@@ -43,7 +43,7 @@ export function App() {
   const gated = !checking && !signedIn && !resetToken
 
   return (
-    <div className="min-h-screen">
+    <div className="app-shell min-h-screen">
       <header className="app-header">
         <div className="mx-auto flex h-16 max-w-[820px] items-center justify-between px-6">
           <button
