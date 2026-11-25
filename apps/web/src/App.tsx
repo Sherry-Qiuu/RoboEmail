@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api, type Professor, type User } from './api'
 import { openFeedback } from './feedback'
 import { AuthPage } from './pages/AuthPage'
@@ -24,10 +24,17 @@ export function App() {
   const [polishSeed, setPolishSeed] = useState('')
   const [polishSource, setPolishSource] = useState('')
   const [writeSeed, setWriteSeed] = useState<Professor | null>(null)
+  const headerRef = useRef<HTMLElement>(null)
   const [resetToken, setResetToken] = useState(() => {
     if (!window.location.pathname.startsWith('/reset')) return ''
     return new URLSearchParams(window.location.search).get('token') ?? ''
   })
+
+  /**
+   * The bar is fixed and grows on narrow screens (brand above the links), so the
+   * page offset is measured rather than assumed to be 64 px.
+   */
+
 
   useEffect(() => {
     api
@@ -45,23 +52,49 @@ export function App() {
   // scroll on a desktop-sized window.
   const locked = view === 'me' && signedIn && !checking
 
+  // The bar is fixed and grows on narrow screens (brand above the links), so the
+  // page offset is measured instead of assumed to be 64 px.
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) return
+    function measure() {
+      const height = header!.getBoundingClientRect().height
+      document.documentElement.style.setProperty('--header-h', `${Math.round(height)}px`)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(header)
+    return () => observer.disconnect()
+  }, [signedIn])
+
   return (
     <div className={`app-shell min-h-screen ${locked ? 'app-shell--locked' : ''}`}>
-      <header className="app-header">
-        <div className="mx-auto flex h-16 max-w-[820px] items-center justify-between px-6">
-          <button
-            onClick={() => setView('write')}
-            className="flex items-center gap-[11px]"
-            aria-label="RoboEmail 首页"
-          >
-            <BrandMark className="h-[29px] w-[29px] shrink-0" />
-            <span className="brand-wordmark text-[19px] leading-none" aria-hidden="true">
-              <span className="text-ink">Robo</span>
-              <span className="text-accent">Email</span>
-            </span>
-          </button>
+      <header className="app-header" ref={headerRef}>
+        <div className="app-bar mx-auto max-w-[820px] px-6">
+          <div className="app-bar-top">
+            <button
+              onClick={() => setView('write')}
+              className="flex items-center gap-[11px]"
+              aria-label="RoboEmail 首页"
+            >
+              <BrandMark className="h-[29px] w-[29px] shrink-0" />
+              <span className="brand-wordmark text-[19px] leading-none" aria-hidden="true">
+                <span className="text-ink">Robo</span>
+                <span className="text-accent">Email</span>
+              </span>
+            </button>
 
-          <nav className="flex items-center gap-6 text-[13px]">
+            {signedIn && (
+              <button
+                className={`app-bar-user ${navClass(view === 'settings')}`}
+                onClick={() => setView('settings')}
+              >
+                {user?.username}
+              </button>
+            )}
+          </div>
+
+          <nav className="app-bar-nav">
             {signedIn && (
               <>
                 <button
@@ -92,9 +125,9 @@ export function App() {
                 <button className={navClass(view === 'learn')} onClick={() => setView('learn')}>
                   学习
                 </button>
-                <span className="h-3 w-px bg-rule" />
+                <span className="app-bar-divider" />
                 <button
-                  className={navClass(view === 'settings')}
+                  className={`app-bar-user-nav ${navClass(view === 'settings')}`}
                   onClick={() => setView('settings')}
                 >
                   {user?.username}

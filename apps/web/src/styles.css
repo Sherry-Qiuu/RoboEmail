@@ -216,7 +216,74 @@
   }
 
   .app-shell {
-    padding-top: 64px;
+    padding-top: var(--header-h, 64px);
+  }
+
+  /* One row on a desktop, two on a phone: brand and account above, links below. */
+  .app-bar {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .app-bar-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: none;
+  }
+
+  .app-bar-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 13px;
+  }
+
+  .app-bar-user {
+    display: none;
+  }
+
+  .app-bar-divider {
+    width: 1px;
+    height: 12px;
+    background: var(--edge-border, #e6e4dc);
+  }
+
+  /* The account moves from the link row to the brand row on narrow screens. */
+  @media (max-width: 720px) {
+    .app-bar {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 8px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .app-bar-top {
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .app-bar-user {
+      display: inline;
+      font-size: 13px;
+    }
+
+    .app-bar-user-nav,
+    .app-bar-divider {
+      display: none;
+    }
+
+    .app-bar-nav {
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--edge-border, #e6e4dc);
+    }
   }
 
   /* Empty cells in the activity heatmap. A surface token turns to glass under an
