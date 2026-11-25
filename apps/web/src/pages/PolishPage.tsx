@@ -101,7 +101,6 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
   const [data, setData] = useState<PolishResponse | null>(null)
   const [showRemoved, setShowRemoved] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [round, setRound] = useState(0)
   const [tags, setTags] = useState<string[]>(
     () => readDraft<{ text: string; tags?: string[] }>('polish')?.tags ?? [],
   )
@@ -140,7 +139,6 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
     setLoading(true)
     setError('')
     setCopied(false)
-    setRound(0)
     try {
       const response = await api.polish(text, {
         recipient,
@@ -177,24 +175,17 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
     }
   }
 
-  /** Rerun on the current revision, with the same chips and free text. */
-  async function rerun() {
+  /**
+   * Carry the result back into the input so the next round starts from it.
+   * The direction and chips stay as they are: only the letter is replaced.
+   */
+  function continueEdit() {
     if (!data) return
-    setLoading(true)
+    setText(data.result.revised)
+    setData(null)
+    setCopied(false)
     setError('')
-    try {
-      const response = await api.polish(data.result.revised, {
-        recipient,
-        formality,
-        instruction: buildInstruction(),
-      })
-      setData(response)
-      setRound((current) => current + 1)
-    } catch (cause) {
-      fail(cause)
-    } finally {
-      setLoading(false)
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   async function copy() {
@@ -320,27 +311,10 @@ export function PolishPage({ onNeedAccount, preset = '', sourceId }: Props) {
             </ul>
           )}
 
-          <div className="mt-10 border-t border-rule pt-6">
-            <div className="flex items-baseline justify-between">
-              <span className="label">继续改</span>
-              {round > 0 && <span className="text-[12px] text-faint">第 {round + 1} 版</span>}
-            </div>
-
-            <div className="mt-3">
-              <DirectionPicker
-                tags={tags}
-                onToggle={toggleTag}
-                direction={direction}
-                setDirection={setDirection}
-                disabled={loading}
-              />
-            </div>
-
-            <div className="mt-4 flex justify-end">
-              <button className="btn btn-ghost" onClick={() => void rerun()} disabled={loading}>
-                {loading ? '正在改…' : '再润色一次'}
-              </button>
-            </div>
+          <div className="mt-10 flex justify-end border-t border-rule pt-6">
+            <button className="btn btn-ghost" onClick={continueEdit}>
+              继续改
+            </button>
           </div>
 
           <ResultRating page="polish" />
