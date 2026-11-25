@@ -11,6 +11,7 @@ function facultyName(faculty: string): string {
   if (faculty === 'se') return '理工学院'
   if (faculty === 'fhss') return '人文社科学院'
   if (faculty === 'nubs') return '商学院'
+  if (faculty === 'cele') return '语言教学中心'
   return ''
 }
 

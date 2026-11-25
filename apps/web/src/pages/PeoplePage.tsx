@@ -21,6 +21,7 @@ const SCHOOL_LABEL: Record<string, string> = {
   'Faculty of Science and Engineering': '理工学院',
   'Faculty of Humanities and Social Sciences': '人文社科学院',
   'Nottingham University Business School China': '商学院',
+  'Centre for English Language Education': '语言教学中心',
 }
 
 const FACULTY_OFFICE = 'Faculty of Science and Engineering (faculty office)'

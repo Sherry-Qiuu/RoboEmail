@@ -3,29 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>学习 · 热力图演示</title>
+<title>学习 · 热力图演示（可换配色）</title>
 <style>
   :root {
     --paper: #f3f3f1; --surface: #ffffff; --ink: #191917; --muted: #6f6f68;
     --faint: #9b9b93; --rule: #e6e4dc; --accent: #4f7a5b; --accent-soft: #edf2ee;
+    --cell-empty: #eeeeea; --accent-ink: #ffffff;
+  }
+  html[data-mode="dark"] {
+    --paper: #1b1b1a; --surface: #232322; --ink: #f1f1ee; --muted: #b4b4ad;
+    --faint: #8d8d86; --rule: #343431; --accent-soft: #26302a; --cell-empty: #2c2c29;
+    --accent-ink: #191917;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; color: var(--ink);
+    margin: 0; color: var(--ink); background: var(--paper);
+    font: 14px/1.6 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    transition: background .2s ease, color .2s ease;
+  }
+  html[data-mode="light"] body {
     background:
       radial-gradient(1200px 520px at 75% -12%, #e7eef2 0%, transparent 62%),
       var(--paper);
-    font: 14px/1.6 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   }
   .demo-badge {
     position: fixed; right: 16px; top: 16px; z-index: 60;
-    background: #191917; color: #f7f7f4; font-size: 11px; letter-spacing: .08em;
+    background: var(--ink); color: var(--paper); font-size: 11px; letter-spacing: .08em;
     padding: 5px 10px; border-radius: 6px;
   }
   header {
     position: sticky; top: 0; z-index: 20;
     border-bottom: 1px solid var(--rule);
-    background: rgba(251,251,249,.92);
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
     backdrop-filter: blur(16px) saturate(140%);
   }
   .bar { max-width: 860px; margin: 0 auto; height: 60px; padding: 0 24px;
@@ -33,25 +42,44 @@
   .brand { display: flex; align-items: center; gap: 10px;
            font-family: Georgia, "Songti SC", serif; font-size: 19px; }
   .mark { width: 26px; height: 26px; border-radius: 7px; background: var(--accent);
-          color: #fff; display: grid; place-items: center; font-family: Georgia, serif; }
+          color: var(--accent-ink); display: grid; place-items: center; font-family: Georgia, serif; }
   nav { display: flex; gap: 20px; font-size: 13px; color: var(--muted); }
   nav b { color: var(--ink); font-weight: 400; }
-  main { max-width: 860px; margin: 0 auto; padding: 44px 24px 120px; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 24px 120px; }
   h1 { font-family: Georgia, "Songti SC", serif; font-size: 30px; font-weight: 400;
-       margin: 0 0 34px; letter-spacing: -.01em; }
+       margin: 0 0 26px; letter-spacing: -.01em; }
   .label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
   .top { display: grid; grid-template-columns: 140px 1fr; gap: 40px; align-items: start; }
   .big { font-family: Georgia, serif; font-size: 42px; line-height: 1; margin: 6px 0 6px; }
 
+  /* ---------- theme bar ---------- */
+  .themebar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin: 0 0 26px; padding: 12px 14px; border: 1px solid var(--rule);
+    border-radius: 10px; background: var(--surface);
+  }
+  .themebar .name { font-size: 12px; color: var(--faint); margin-right: 4px; }
+  .sw {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+    cursor: pointer; padding: 0; position: relative;
+  }
+  .sw[aria-pressed="true"] { border-color: var(--ink); }
+  .sw[aria-pressed="true"]::after {
+    content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
+    color: #fff; font-size: 11px;
+  }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12px;
+    padding: 5px 12px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+
   /* ---------- heatmap ---------- */
   .heat { display: flex; gap: 3px; }
   .heat .col { display: flex; flex-direction: column; gap: 3px; }
-  .cell { width: 11px; height: 11px; border-radius: 2px; background: #eeeeea; }
-  .cell.l1 { background: var(--accent); opacity: .2; }
-  .cell.l2 { background: var(--accent); opacity: .4; }
-  .cell.l3 { background: var(--accent); opacity: .6; }
-  .cell.l4 { background: var(--accent); opacity: .8; }
-  .cell.l5 { background: var(--accent); opacity: 1; }
+  .cell { width: 11px; height: 11px; border-radius: 2px; background: var(--cell-empty); }
+  .cell.a { background: var(--accent); }
   .cell.blank { background: transparent; }
   .months { position: relative; height: 16px; }
   .months span { position: absolute; top: 0; font-size: 10px; color: var(--faint); }
@@ -68,6 +96,7 @@
   .track { height: 2px; background: var(--rule); position: relative; }
   .fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
   .note { margin-top: 26px; font-size: 12px; color: var(--faint); line-height: 1.9; }
+  .note b { color: var(--muted); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -82,6 +111,24 @@
 
 <main>
   <h1>学习</h1>
+
+  <div class="themebar">
+    <span class="name">配色</span>
+    <button class="sw" data-theme="sage" aria-pressed="true" title="鼠尾草" style="background:#4f7a5b"></button>
+    <button class="sw" data-theme="azure" aria-pressed="false" title="湖蓝" style="background:#2f6fed"></button>
+    <button class="sw" data-theme="amber" aria-pressed="false" title="暖砂" style="background:#a96418"></button>
+    <button class="sw" data-theme="rose" aria-pressed="false" title="玫瑰" style="background:#b04d6c"></button>
+    <button class="sw" data-theme="iris" aria-pressed="false" title="鸢尾" style="background:#6a57c8"></button>
+
+    <span style="width:1px;height:20px;background:var(--rule);margin:0 6px"></span>
+
+    <div class="seg">
+      <button data-mode="light" aria-pressed="true">浅色</button>
+      <button data-mode="dark" aria-pressed="false">深色</button>
+    </div>
+
+    <span class="name" id="modeLabel" style="margin-left:auto">鼠尾草 · 浅色</span>
+  </div>
 
   <div class="top">
     <div>
@@ -106,16 +153,18 @@
           <div class="legend">
             <span>少</span>
             <span class="cell"></span>
-            <span class="cell l1"></span><span class="cell l2"></span>
-            <span class="cell l3"></span><span class="cell l4"></span>
-            <span class="cell l5"></span>
+            <span class="cell a" style="opacity:.2"></span>
+            <span class="cell a" style="opacity:.4"></span>
+            <span class="cell a" style="opacity:.6"></span>
+            <span class="cell a" style="opacity:.8"></span>
+            <span class="cell a" style="opacity:1"></span>
             <span>多</span>
           </div>
         </div>
       </div>
 
       <p style="margin:10px 0 0;font-size:11px;color:var(--faint)">
-        悬停任意方块可看到日期与条数（浏览器原生提示）
+        悬停任意方块可看到日期与条数
       </p>
     </div>
   </div>
@@ -127,39 +176,57 @@
     <div class="barrow"><span>中式表达</span><div class="track"><div class="fill" style="width:50%"></div></div><span>1</span></div>
   </div>
 
-  <div style="margin-top:44px">
-    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--faint)">
-      <span>错题本</span><span>4 条</span>
-    </div>
-    <div style="display:flex;gap:18px;margin-top:14px;font-size:13px;color:var(--muted)">
-      <b style="background:#191917;color:#fff;padding:4px 12px;border-radius:4px;font-weight:400">全部</b>
-      <span>句法</span><span>搭配</span><span>中式表达</span>
-    </div>
-    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--rule);font-size:13px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--faint)">
-        <span>中式表达</span><span>标记已掌握</span>
-      </div>
-      <p style="margin:6px 0 2px">
-        <s>Thank you for your receiving.</s> → <span style="color:var(--accent)">Thank you for your time.</span>
-      </p>
-      <p style="margin:0;font-size:12px;color:var(--muted)">
-        "for your receiving" 不符合英语搭配，属于中式英语，应改为地道表达。
-      </p>
-    </div>
-  </div>
-
   <p class="note">
-    这一页是演示，方块里的数据是<b>编造的</b>，用来展示一年视图中「零星几天有记录」是什么样子。<br />
-    真实的 4 条记录会集中在最近几天，其余 350 多格都是空的——那是正常状态，不是坏了。
+    这一页是演示，方块里的数据是<b>编造的</b>。<br />
+    配色和明暗切换对应站内左下角的「外观」面板：鼠尾草 / 湖蓝 / 暖砂 / 玫瑰 / 鸢尾，各有浅色与深色两套。<br />
+    真实数据只有 4 条，会集中在最近几天，其余 350 多格是空的——那是正常状态。
   </p>
 </main>
 
 <script>
-  // Same geometry as apps/web/src/calendar.ts: one column per week, Monday top,
-  // ending on the current week.
-  const CELL = 11, GAP = 3
+  const THEMES = {
+    sage:  { name: '鼠尾草', light: '#4f7a5b', dark: '#a8c9a6', softLight: '#edf2ee', softDark: '#26302a', ink: '#ffffff', inkDark: '#191917' },
+    azure: { name: '湖蓝',   light: '#2f6fed', dark: '#8ab8ff', softLight: '#e9f0fe', softDark: '#1d283c', ink: '#ffffff', inkDark: '#191917' },
+    amber: { name: '暖砂',   light: '#a96418', dark: '#e9b36a', softLight: '#f7efe3', softDark: '#332a1d', ink: '#ffffff', inkDark: '#191917' },
+    rose:  { name: '玫瑰',   light: '#b04d6c', dark: '#e8a4b8', softLight: '#f9edf1', softDark: '#38222a', ink: '#ffffff', inkDark: '#191917' },
+    iris:  { name: '鸢尾',   light: '#6a57c8', dark: '#b9a8ff', softLight: '#efecfb', softDark: '#2a2540', ink: '#ffffff', inkDark: '#191917' },
+  }
 
-  // Simulated activity: a handful of days, weighted towards the last two months.
+  let theme = 'sage'
+  let mode = 'light'
+
+  function applyTheme() {
+    const t = THEMES[theme]
+    const root = document.documentElement
+    root.dataset.mode = mode
+    root.style.setProperty('--accent', mode === 'light' ? t.light : t.dark)
+    root.style.setProperty('--accent-soft', mode === 'light' ? t.softLight : t.softDark)
+    root.style.setProperty('--accent-ink', mode === 'light' ? t.ink : t.inkDark)
+
+    document.querySelectorAll('.sw').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.theme === theme))
+      button.style.background = THEMES[button.dataset.theme][mode === 'light' ? 'light' : 'dark']
+    })
+    document.querySelectorAll('.seg button').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.mode === mode))
+    })
+    document.getElementById('modeLabel').textContent = t.name + ' · ' + (mode === 'light' ? '浅色' : '深色')
+  }
+
+  document.querySelectorAll('.sw').forEach((button) => {
+    button.addEventListener('click', () => {
+      theme = button.dataset.theme
+      applyTheme()
+    })
+  })
+  document.querySelectorAll('.seg button').forEach((button) => {
+    button.addEventListener('click', () => {
+      mode = button.dataset.mode
+      applyTheme()
+    })
+  })
+
+  // Same geometry as apps/web/src/calendar.ts: one column per week, Monday top.
   const samples = [
     ['2026-09-08', 1], ['2026-09-15', 2], ['2026-09-16', 1],
     ['2026-09-29', 3], ['2026-10-06', 1], ['2026-10-07', 2],
@@ -194,7 +261,8 @@
         const n = counts.get(key) || 0
         total += n
         if (n > 0) {
-          cell.classList.add('l' + Math.min(n, 4))
+          cell.classList.add('a')
+          cell.style.opacity = String(0.2 + (Math.min(n, 4) / 4) * 0.8)
           cell.title = key + ' · ' + n + ' 条'
         } else {
           cell.title = key + ' · 0 条'
@@ -203,7 +271,6 @@
       col.appendChild(cell)
       cursor.setDate(cursor.getDate() + 1)
     }
-    if (cursor > start && new Date(col.firstChild.dateKey || cursor).getTime() === 0) { /* noop */ }
     grid.appendChild(col)
 
     const firstOfWeek = new Date(cursor.getTime() - 7 * 86400000)
@@ -212,13 +279,14 @@
       lastMonth = month
       const tag = document.createElement('span')
       tag.textContent = (month + 1) + ' 月'
-      tag.style.left = (index * (CELL + GAP)) + 'px'
+      tag.style.left = (index * 14) + 'px'
       months.appendChild(tag)
     }
     index += 1
   }
 
   document.getElementById('total').textContent = '共 ' + total + ' 条'
+  applyTheme()
 </script>
 </body>
 </html>

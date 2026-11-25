@@ -27,7 +27,7 @@ import { mailer } from './mailer.ts'
 import { runGenerate, type GenerateFields } from './generate.ts'
 import { runPolish } from './polish.ts'
 import { fail, readBody } from './http.ts'
-import { countProfessors, seedProfessors } from './professors.ts'
+import { countProfessors, seedExtraProfessors, seedProfessors } from './professors.ts'
 import { learn } from './routes/learn.ts'
 import { people } from './routes/people.ts'
 
@@ -544,8 +544,10 @@ if (existsSync(webDist)) {
 app.notFound((c) => c.json({ error: 'not_found' }, 404))
 
 // A fresh database has an empty directory; import the bundled list once so the
-// professor page is never blank after a deploy.
+// professor page is never blank after a deploy. CELE came later, so its rows are
+// merged in on every start and skipped when they already exist.
 seedProfessors()
+seedExtraProfessors()
 
 serve({ fetch: app.fetch, port: env.port }, (info) => {
   console.log(`roboemail server  http://127.0.0.1:${info.port}`)

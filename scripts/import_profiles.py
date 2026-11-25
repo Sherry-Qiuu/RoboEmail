@@ -1,6 +1,6 @@
 """Export the offline teacher-profiles bundle for the web app.
 
-Input  : 三院教师主页/ (data.json + photos/, produced by the profile scraper)
+Input  : 教师主页/ (data.json + photos/), covering the three faculties plus CELE
 Output : apps/server/assets/profiles.json
          apps/server/assets/photos/<basename>.jpg  (resized for delivery)
 
@@ -23,7 +23,7 @@ except ImportError:
     sys.exit("Pillow is missing: pip install pillow")
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "三院教师主页"
+SOURCE = ROOT / "教师主页"
 TARGET_DIR = ROOT / "apps" / "server" / "assets"
 PHOTO_DIR = TARGET_DIR / "photos"
 

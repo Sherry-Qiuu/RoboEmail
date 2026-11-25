@@ -12,8 +12,11 @@ release/
 
 # scraped staff-portal bundles behind the profile cards; the built output in
 # apps/server/assets/ is what the app actually reads
+/教师主页/
+/教师主页.zip
 /三院教师主页/
 /三院教师主页.zip
+/data_cele/
 /理工学院教授主页/
 /理工学院教授主页.zip
 /人文社科学院教师照片/

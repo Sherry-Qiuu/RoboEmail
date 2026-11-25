@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { db, newId, nowIso } from './db.ts'
 
 const SEED_FILE = resolve(import.meta.dirname, '../data/professors.json')
+const EXTRA_FILE = resolve(import.meta.dirname, '../data/professors-extra.json')
 
 export type ProfessorRow = {
   id: string
@@ -175,5 +176,76 @@ export function seedProfessors(): number {
   }
 
   console.log(`[professors] seeded ${added} rows from ${SEED_FILE}`)
+  return added
+}
+
+type ExtraRow = {
+  nameEn: string
+  surname: string
+  titleCn: string
+  titleEn?: string
+  school?: string
+  department?: string
+  email?: string | null
+  profileUrl?: string | null
+  sourceUrl?: string | null
+  salutation?: string | null
+}
+
+/**
+ * CELE joined after the original three faculties, so its staff are not in the
+ * scraped directory. They are added here, keyed by email (or name when the
+ * address is not published), and skipped if the row already exists.
+ */
+export function seedExtraProfessors(): number {
+  let rows: ExtraRow[]
+  try {
+    rows = JSON.parse(readFileSync(EXTRA_FILE, 'utf8')) as ExtraRow[]
+  } catch {
+    return 0
+  }
+
+  const byEmail = db.prepare('SELECT id FROM professors WHERE lower(email) = ?')
+  const byName = db.prepare('SELECT id FROM professors WHERE name_en = ? COLLATE NOCASE')
+  const insert = db.prepare(
+    `INSERT INTO professors
+       (id, name_en, surname, name_zh, name_pinyin, title, salutation_override,
+        school, department, email, role, modules, profile_url, source_url, updated_at)
+     VALUES (?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?)`,
+  )
+
+  let added = 0
+  const now = nowIso()
+
+  db.exec('BEGIN')
+  try {
+    for (const row of rows) {
+      const email = row.email ? row.email.trim().toLowerCase() : null
+      if (email ? byEmail.get(email) : byName.get(row.nameEn)) continue
+
+      insert.run(
+        newId(),
+        row.nameEn,
+        row.surname,
+        row.titleCn,
+        row.salutation ?? null,
+        row.school ?? null,
+        row.department || null,
+        email,
+        row.titleEn || null,
+        row.profileUrl ?? null,
+        row.sourceUrl ?? null,
+        now,
+      )
+      added += 1
+    }
+    db.exec('COMMIT')
+  } catch (error) {
+    db.exec('ROLLBACK')
+    console.warn('[professors] extra rows failed:', (error as Error).message)
+    return 0
+  }
+
+  if (added > 0) console.log(`[professors] added ${added} rows from ${EXTRA_FILE}`)
   return added
 }
