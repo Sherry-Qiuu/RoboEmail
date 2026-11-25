@@ -14,6 +14,11 @@ export const CURRENT_VERSION = __APP_VERSION__
 
 export const RELEASES: Release[] = [
   {
+    version: '1.1.1',
+    date: '2026-11-25',
+    items: ['页面往下滚时，顶部的导航栏固定不动了'],
+  },
+  {
     version: '1.1.0',
     date: '2026-11-16',
     items: [

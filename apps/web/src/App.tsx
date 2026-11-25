@@ -43,7 +43,7 @@ export function App() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-rule">
+      <header className="app-header">
         <div className="mx-auto flex h-16 max-w-[820px] items-center justify-between px-6">
           <button
             onClick={() => setView('write')}
