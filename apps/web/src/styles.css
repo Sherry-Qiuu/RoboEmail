@@ -218,4 +218,55 @@
   .app-shell {
     padding-top: 64px;
   }
+
+  /*
+   * With an image theme the page is a landscape, so a translucent bar reads as
+   * a smudge across it. Each theme therefore gets its own solid tone, sampled
+   * from that artwork, with a matching accent for the wordmark.
+   */
+  html[data-edge-image-theme='aurora'] { --app-header-bg: #12303f; --app-header-accent: #7fd4c8; }
+  html[data-edge-image-theme='dune'] { --app-header-bg: #6b4a24; --app-header-accent: #f0c68c; }
+  html[data-edge-image-theme='tide'] { --app-header-bg: #12394d; --app-header-accent: #7fd0e8; }
+  html[data-edge-image-theme='bloom'] { --app-header-bg: #7d4f60; --app-header-accent: #f5cdd9; }
+  html[data-edge-image-theme='nocturne'] { --app-header-bg: #1b1f38; --app-header-accent: #a9b4ff; }
+  html[data-edge-image-theme='alpine'] { --app-header-bg: #33506b; --app-header-accent: #d7e6f5; }
+  html[data-edge-image-theme='forest'] { --app-header-bg: #23402f; --app-header-accent: #a8c9a6; }
+  html[data-edge-image-theme='coast'] { --app-header-bg: #1f5a5a; --app-header-accent: #9ee0d4; }
+  html[data-edge-image-theme='meadow'] { --app-header-bg: #47663a; --app-header-accent: #d8e7b3; }
+  html[data-edge-image-theme='canyon'] { --app-header-bg: #8a4327; --app-header-accent: #f2c39b; }
+
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header {
+    background: var(--app-header-bg, var(--edge-panel-bg));
+    border-bottom-color: rgba(255, 255, 255, 0.18);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    --app-header-ink: #f7f7f4;
+    --app-header-soft: rgba(247, 247, 244, 0.76);
+  }
+
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .text-ink {
+    color: var(--app-header-ink);
+  }
+
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .text-muted {
+    color: var(--app-header-soft);
+  }
+
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .text-muted:hover {
+    color: var(--app-header-ink);
+  }
+
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .text-accent {
+    color: var(--app-header-accent);
+  }
+
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header .bg-rule {
+    background: rgba(255, 255, 255, 0.26);
+  }
+
+  /* The badge keeps its shape but takes the theme accent so it reads on the tone. */
+  html[data-edge-image-theme]:not([data-edge-image-theme='none']) .app-header svg {
+    --brand-mark-bg: rgba(255, 255, 255, 0.16);
+    --brand-mark-fg: var(--app-header-accent);
+  }
 }
