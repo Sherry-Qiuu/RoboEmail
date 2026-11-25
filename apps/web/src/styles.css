@@ -376,14 +376,18 @@
   padding-right: 6px;
 }
 
-/* The letter's title stays put while its versions scroll underneath. */
+/* The letter's title sticks, but only frosts the page once something is
+   actually scrolling underneath it. */
 .history-thread-head {
   position: sticky;
   top: 0;
   z-index: 5;
   padding: 2px 0 10px;
-  background: color-mix(in srgb, var(--edge-bg, #f3f3f1) 88%, transparent);
-  backdrop-filter: blur(8px);
+}
+
+.history-pane[data-scrolled='true'] .history-thread-head {
+  background: color-mix(in srgb, var(--edge-bg, #f3f3f1) 90%, transparent);
+  backdrop-filter: blur(10px) saturate(120%);
 }
 
 @media (max-width: 900px) {

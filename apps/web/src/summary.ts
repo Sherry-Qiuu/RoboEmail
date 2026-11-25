@@ -29,8 +29,25 @@ export function summaryLine(text: string, fallback: string): string {
     .map((line) => line.trim())
     .filter(Boolean)
 
-  const body = lines.filter((line) => !GREETING.test(line) && !SIGN_OFF.test(line))
-  const candidate = body.map(withoutOpener).find(Boolean) ?? lines[0] ?? fallback
+  // Everything from the last sign-off down is a closing plus a signature, and a
+  // signature reads as a bare name ("Shihan") that says nothing about the letter.
+  let end = lines.length
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    if (SIGN_OFF.test(lines[index]!)) {
+      end = index
+      break
+    }
+  }
+
+  const body = lines
+    .slice(0, end)
+    .filter((line) => !GREETING.test(line))
+    .map(withoutOpener)
+    .filter(Boolean)
+
+  // A one-word line is almost always a name, so prefer a line with real words.
+  const candidate =
+    body.find((line) => line.split(/\s+/).length >= 3) ?? body[0] ?? lines[0] ?? fallback
 
   const sentence = candidate.match(FIRST_SENTENCE)?.[0] ?? candidate
   const clean = sentence.replace(/\s+/g, ' ').trim()

@@ -107,6 +107,7 @@ export function MyPage() {
   const [openVersions, setOpenVersions] = useState<Set<string>>(new Set())
   const [popOpen, setPopOpen] = useState(false)
   const [popYear, setPopYear] = useState(cursor.year)
+  const [scrolled, setScrolled] = useState(false)
 
   const menu = useRef<HTMLDivElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -510,7 +511,11 @@ export function MyPage() {
             </div>
           </div>
 
-          <div className="history-pane">
+          <div
+            className="history-pane"
+            data-scrolled={scrolled}
+            onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 4)}
+          >
             {thread ? (
               <>
                 <div className="history-thread-head">
