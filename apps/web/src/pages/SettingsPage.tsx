@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { api, type User } from '../api'
+import { openChangelog } from '../releaseNotes'
 
 type Props = {
   user: User
@@ -96,9 +97,15 @@ export function SettingsPage({ user, onLoggedOut }: Props) {
         </form>
       </div>
 
-      <div className="mt-16 border-t border-rule pt-6">
+      <div className="mt-16 flex flex-col gap-4 border-t border-rule pt-6">
         <button
-          className="text-[13px] text-muted transition-colors hover:text-ink"
+          className="self-start text-[13px] text-muted transition-colors hover:text-ink"
+          onClick={openChangelog}
+        >
+          查看历史更新记录
+        </button>
+        <button
+          className="self-start text-[13px] text-muted transition-colors hover:text-ink"
           onClick={logout}
           disabled={leaving}
         >
