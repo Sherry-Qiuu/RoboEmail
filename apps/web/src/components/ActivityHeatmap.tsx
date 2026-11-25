@@ -34,7 +34,7 @@ export function ActivityHeatmap({ days }: { days: Day[] }) {
         <span className="text-[12px] text-faint">共 {totals} 条</span>
       </div>
 
-      <div className="mt-3 overflow-x-auto pb-1">
+      <div className="heatmap-scroll mt-3 overflow-x-auto pb-1">
         <div className="inline-block min-w-max">
           <div className="relative h-4" style={{ width: weeks.length * (CELL + GAP) }}>
             {months.map((month) => (
