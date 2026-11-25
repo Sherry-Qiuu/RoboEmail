@@ -126,6 +126,28 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
   const set = (key: keyof GenerateFields) => (value: GenerateFields[keyof GenerateFields]) =>
     setFields((current) => ({ ...current, [key]: value }))
 
+  /** Back to a blank form: purposes, fields, result and the saved draft. */
+  function reset() {
+    const hasContent = Boolean(
+      fields.background?.trim() ||
+        fields.ask?.trim() ||
+        fields.reason?.trim() ||
+        fields.checked?.trim() ||
+        fields.deadline?.trim() ||
+        fields.recipientName?.trim(),
+    )
+    if (hasContent && !window.confirm('清空这一页填写的内容？')) return
+    setPurposes(['inquiry'])
+    setFields({ ...EMPTY })
+    setSalutation('')
+    setData(null)
+    setSubjectIndex(0)
+    setSlotValues({})
+    setError('')
+    setEntryId('')
+    writeDraft('write', { purposes: ['inquiry'], fields: { ...EMPTY }, salutation: '' })
+  }
+
   async function run() {
     setLoading(true)
     setError('')
@@ -180,7 +202,15 @@ export function WritePage({ onNeedAccount, onPolish, seed }: Props) {
 
   return (
     <section>
-      <h1 className="font-display text-[32px] leading-none tracking-tight">写邮件</h1>
+      <div className="flex items-baseline justify-between gap-4">
+        <h1 className="font-display text-[32px] leading-none tracking-tight">写邮件</h1>
+        <button
+          className="text-[12px] text-faint transition-colors hover:text-ink"
+          onClick={reset}
+        >
+          清空
+        </button>
+      </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-2">
         {PURPOSES.map((item) => {
