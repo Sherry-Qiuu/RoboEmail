@@ -232,6 +232,449 @@
 }
 
 /*
+ * The history view locks the page and scrolls its own regions: the title row and
+ * calendar stay put, the day list and the letter pane scroll independently.
+ * Only on a wide window — below the breakpoint it falls back to a normal page.
+ */
+.app-shell--locked {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell--locked main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  /* Wide enough for a 286 px rail plus a readable letter column. */
+  max-width: 1060px;
+}
+
+.app-shell--locked footer {
+  flex: none;
+}
+
+.history-page {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 22px;
+  padding-bottom: 10px;
+}
+
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.history-panes {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 286px minmax(0, 1fr);
+  gap: 44px;
+  margin-top: 16px;
+}
+
+.history-rail {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-daylist {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
+
+.history-daylist ul {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-pane {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* The letter's title stays put while its versions scroll underneath. */
+.history-thread-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 2px 0 10px;
+  background: color-mix(in srgb, var(--edge-bg, #f3f3f1) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 900px) {
+  .app-shell--locked {
+    height: auto;
+    overflow: visible;
+  }
+
+  .app-shell--locked main {
+    overflow: visible;
+  }
+
+  .history-page {
+    height: auto;
+  }
+
+  .history-panes {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .history-pane {
+    overflow: visible;
+  }
+
+  .history-daylist ul {
+    overflow: visible;
+  }
+}
+
+/* ---------- month calendar ---------- */
+.history-cal {
+  position: relative;
+  border: 1px solid var(--edge-border, #e6e4dc);
+  border-radius: 12px;
+  background: var(--edge-surface, #ffffff);
+  padding: 12px 14px 8px;
+}
+
+.history-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-cal-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: -6px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--edge-text, #191917);
+  cursor: pointer;
+}
+
+.history-cal-title:hover {
+  background: var(--edge-hover, #f0f0ec);
+}
+
+.history-cal-title .caret {
+  font-size: 9px;
+  color: var(--edge-faint, #9b9b93);
+}
+
+.history-cal-nav {
+  display: flex;
+  gap: 2px;
+}
+
+.history-cal-nav button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--edge-faint, #9b9b93);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.history-cal-nav button:hover {
+  background: var(--edge-hover, #f0f0ec);
+  color: var(--edge-text, #191917);
+}
+
+.history-cal-weekdays,
+.history-cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.history-cal-weekdays {
+  margin-top: 6px;
+}
+
+.history-cal-weekdays span {
+  padding-bottom: 2px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--edge-faint, #9b9b93);
+}
+
+.history-cal-days {
+  row-gap: 1px;
+}
+
+.history-day {
+  position: relative;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--edge-text, #191917);
+  cursor: pointer;
+}
+
+.history-day:hover {
+  background: var(--edge-hover, #f0f0ec);
+}
+
+.history-day--muted {
+  color: var(--edge-faint, #c9c8c1);
+}
+
+.history-day--today {
+  box-shadow: inset 0 0 0 1px var(--edge-border-strong, #d0d0c8);
+}
+
+.history-day--selected {
+  background: var(--edge-text, #191917);
+  color: var(--edge-bg, #ffffff);
+}
+
+.history-day--selected:hover {
+  background: var(--edge-text, #191917);
+}
+
+.history-day .dot {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: var(--edge-accent, #4f7a5b);
+}
+
+.history-day--selected .dot {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- year / month picker ---------- */
+.history-cal-pop {
+  position: absolute;
+  top: 46px;
+  left: 12px;
+  z-index: 30;
+  width: 232px;
+  padding: 10px 12px 8px;
+  border: 1px solid var(--edge-border, #e6e4dc);
+  border-radius: 12px;
+  background: var(--edge-surface, #ffffff);
+  box-shadow: 0 18px 44px rgba(25, 25, 23, 0.16);
+}
+
+.history-cal-pop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-cal-pop-head button {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--edge-faint, #9b9b93);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.history-cal-pop-head button:hover {
+  background: var(--edge-hover, #f0f0ec);
+  color: var(--edge-text, #191917);
+}
+
+.history-cal-months {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.history-cal-months button {
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--edge-text, #191917);
+  cursor: pointer;
+}
+
+.history-cal-months button:hover {
+  background: var(--edge-hover, #f0f0ec);
+}
+
+.history-cal-months button[aria-current='true'] {
+  border-color: var(--edge-accent, #4f7a5b);
+  background: var(--edge-accent, #4f7a5b);
+  color: var(--edge-accent-ink, #ffffff);
+}
+
+.history-cal-pop-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--edge-border, #e6e4dc);
+}
+
+.history-cal-pop-foot button {
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--edge-accent-strong, #3f6549);
+  cursor: pointer;
+}
+
+.history-cal-pop-foot button:hover {
+  color: var(--edge-text, #191917);
+}
+
+/* ---------- day entries ---------- */
+.history-entry {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-entry:hover {
+  background: var(--edge-hover, #f0f0ec);
+}
+
+.history-entry[aria-current='true'] {
+  background: var(--edge-accent-soft, #edf2ee);
+}
+
+.history-entry-time {
+  font-size: 11px;
+  color: var(--edge-faint, #9b9b93);
+}
+
+.history-entry-title {
+  display: -webkit-box;
+  margin-top: 1px;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.history-entry-tag {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--edge-accent-soft, #edf2ee);
+  color: var(--edge-accent-strong, #3f6549);
+  font-size: 11px;
+}
+
+/* ---------- versions ---------- */
+.history-version {
+  border-bottom: 1px solid var(--edge-border, #e6e4dc);
+}
+
+.history-version-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-version-caret {
+  width: 12px;
+  font-size: 10px;
+  color: var(--edge-faint, #9b9b93);
+  transition: transform 150ms var(--edge-ease, ease);
+}
+
+.history-version[data-open='true'] .history-version-caret {
+  transform: rotate(90deg);
+}
+
+.history-version-label {
+  font-size: 13px;
+}
+
+.history-version-meta {
+  font-size: 12px;
+  color: var(--edge-faint, #9b9b93);
+}
+
+.history-version-actions {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--edge-text-2, #4a4a45);
+}
+
+.history-version-body {
+  padding: 0 4px 16px 26px;
+}
+
+.history-letter {
+  padding: 18px 20px;
+  border: 1px solid var(--edge-border, #e6e4dc);
+  border-radius: 10px;
+  background: var(--edge-surface, #ffffff);
+  white-space: pre-wrap;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--edge-text, #23231f);
+}
+
+/*
  * Image themes, deliberately outside every layer.
  *
  * Tailwind's utilities layer is declared after components, and a later layer

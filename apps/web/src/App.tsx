@@ -41,9 +41,12 @@ export function App() {
   // the sign-in screen instead of the app shell.
   const signedIn = Boolean(user)
   const gated = !checking && !signedIn && !resetToken
+  // The history view manages its own scroll regions, so the page itself must not
+  // scroll on a desktop-sized window.
+  const locked = view === 'me' && signedIn && !checking
 
   return (
-    <div className="app-shell min-h-screen">
+    <div className={`app-shell min-h-screen ${locked ? 'app-shell--locked' : ''}`}>
       <header className="app-header">
         <div className="mx-auto flex h-16 max-w-[820px] items-center justify-between px-6">
           <button
@@ -102,7 +105,7 @@ export function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[820px] px-6 py-14">
+      <main className={`mx-auto max-w-[820px] px-6 ${locked ? 'history-main' : 'py-14'}`}>
         {checking ? (
           <p className="text-[13px] text-faint">读取中…</p>
         ) : resetToken ? (
