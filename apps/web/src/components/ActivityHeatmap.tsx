@@ -11,6 +11,19 @@ function levelFor(n: number): number {
   return Math.min(n, LEVELS)
 }
 
+/**
+ * Empty days use a translucent ink rather than a surface token: with an image
+ * theme the surfaces turn to glass and the grid all but disappears. The ink
+ * still reads over artwork in both light and dark.
+ */
+const EMPTY = 'var(--heat-empty, rgba(25, 25, 23, 0.1))'
+const FILLED = 'var(--edge-accent, #4f7a5b)'
+
+/** Level 1 still has to be visible on artwork, so the range starts at 0.35. */
+function strength(level: number): number {
+  return 0.35 + (level / LEVELS) * 0.65
+}
+
 export function ActivityHeatmap({ days }: { days: Day[] }) {
   const { weeks, months, totals } = useMemo(() => buildCalendar(days), [days])
 
@@ -57,13 +70,8 @@ export function ActivityHeatmap({ days }: { days: Day[] }) {
                       width: CELL,
                       height: CELL,
                       borderRadius: 2,
-                      background:
-                        cell.n < 0
-                          ? 'transparent'
-                          : cell.n === 0
-                            ? 'var(--edge-surface-3, #eeeeea)'
-                            : 'var(--edge-accent, #4f7a5b)',
-                      opacity: cell.n < 0 ? 0 : cell.n === 0 ? 1 : 0.2 + (levelFor(cell.n) / LEVELS) * 0.8,
+                      background: cell.n < 0 ? 'transparent' : cell.n === 0 ? EMPTY : FILLED,
+                      opacity: cell.n < 0 ? 0 : cell.n === 0 ? 1 : strength(levelFor(cell.n)),
                     }}
                   />
                 ))}
@@ -80,9 +88,8 @@ export function ActivityHeatmap({ days }: { days: Day[] }) {
                   width: CELL,
                   height: CELL,
                   borderRadius: 2,
-                  background:
-                    level === 0 ? 'var(--edge-surface-3, #eeeeea)' : 'var(--edge-accent, #4f7a5b)',
-                  opacity: level === 0 ? 1 : 0.2 + (level / LEVELS) * 0.8,
+                  background: level === 0 ? EMPTY : FILLED,
+                  opacity: level === 0 ? 1 : strength(level),
                 }}
               />
             ))}

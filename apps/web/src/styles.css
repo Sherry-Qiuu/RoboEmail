@@ -219,6 +219,17 @@
     padding-top: 64px;
   }
 
+  /* Empty cells in the activity heatmap. A surface token turns to glass under an
+     image theme, so this is an ink wash instead: legible over artwork and still
+     readable in dark mode. */
+  :root {
+    --heat-empty: rgba(25, 25, 23, 0.1);
+  }
+
+  html[data-edge-mode='dark'] {
+    --heat-empty: rgba(255, 255, 255, 0.12);
+  }
+
   /*
    * With an image theme the page is a landscape, so a translucent bar reads as
    * a smudge across it. Each theme therefore gets its own solid tone, sampled
